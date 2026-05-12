@@ -18,6 +18,7 @@ const DATA = {
     aportes: [
         { socio:'Socio A', monto:1500, fecha:'12-may' },
         { socio:'Socio A', monto:3000, fecha:'12-may' },
+        { socio:'Socio A', monto:365.65, fecha:'12-may' },
         { socio:'Socio B', monto:3000, fecha:'12-may' }
     ], 
     costoDiario: 17.50,
@@ -137,8 +138,8 @@ function updateStatusSocio(socioId, actual, ideal) {
     const diff = actual - ideal;
     const statusEl = document.getElementById(`statusSocio${socioId}`);
     const cardEl = document.getElementById(`cardSocio${socioId}`);
-    if (diff >= 0) {
-        statusEl.innerHTML = `<span style="color:var(--green)">✓ OK (S/ +${diff.toFixed(2)})</span>`;
+    if (diff >= -0.01) { // Tolerancia por decimales
+        statusEl.innerHTML = `<span style="color:var(--green)">✓ OK (S/ +${Math.max(0, diff).toFixed(2)})</span>`;
         cardEl.style.borderColor = 'var(--green)';
     } else {
         statusEl.innerHTML = `<span style="color:var(--red)">⚠ DEBE (S/ ${Math.abs(diff).toFixed(2)})</span>`;
