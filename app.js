@@ -15,6 +15,7 @@ const DATA = {
         { fecha:'11-May 2026', tipo:'alimentacion', concepto:'Proyección Alimento', detalle:'Ración diaria (S/35) x 25 días', monto:875.00 },
         { fecha:'11-May 2026', tipo:'otro', concepto:'Limpieza', detalle:'Limpieza de pozo y corral', monto:30.00 },
     ],
+    aportes: [], // Historial de aportes reales
     costoDiario: 17.50,
     fechaInicio: new Date('2026-05-06')
 };
@@ -91,23 +92,48 @@ function renderSocioData() {
     document.getElementById('socioUtilidad').textContent = `S/ ${utilidadNeta.toFixed(2)}`;
     document.getElementById('socioPagoCadaUno').textContent = `S/ ${porSocio.toFixed(2)}`;
     
-    // Nueva sección de aportes
     document.getElementById('socioInvEjecutada').textContent = `S/ ${inv.toFixed(2)}`;
     document.getElementById('socioFondoReserva').textContent = `S/ ${fondoReserva.toFixed(2)}`;
     document.getElementById('socioTotalFondear').textContent = `S/ ${totalFondear.toFixed(2)}`;
     document.getElementById('socioAporteCadaUno').textContent = `S/ ${aporteSocio.toFixed(2)}`;
 
-    // Lista simplificada de gastos para el socio
-    const lista = document.getElementById('socioListaGastos');
-    lista.innerHTML = '';
+    // Gastos compartidos
+    const listaG = document.getElementById('socioListaGastos');
+    listaG.innerHTML = '';
     DATA.gastos.slice().reverse().forEach(g => {
-        lista.innerHTML += `
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
+        listaG.innerHTML += `
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
                 <span>${g.fecha} - ${g.concepto}</span>
                 <span style="color:var(--text)">S/ ${g.monto.toFixed(2)}</span>
             </div>
         `;
     });
+
+    // Aportes reales
+    const listaA = document.getElementById('socioListaAportes');
+    listaA.innerHTML = '';
+    let tA = 0, tB = 0;
+    DATA.aportes.slice().reverse().forEach(a => {
+        if (a.socio === 'Socio A') tA += a.monto; else tB += a.monto;
+        listaA.innerHTML += `
+            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
+                <span><strong style="color:${a.socio === 'Socio A' ? 'var(--blue)' : 'var(--purple)'}">${a.socio}</strong> - ${a.fecha}</span>
+                <span style="color:var(--text)">S/ ${a.monto.toFixed(2)}</span>
+            </div>
+        `;
+    });
+    document.getElementById('totalAporteA').textContent = `S/ ${tA.toFixed(2)}`;
+    document.getElementById('totalAporteB').textContent = `S/ ${tB.toFixed(2)}`;
+}
+
+function registrarAporte() {
+    const socio = document.getElementById('aporteSocio').value;
+    const monto = parseFloat(document.getElementById('aporteMonto').value);
+    const fecha = new Date().toLocaleDateString('es-PE', { day:'2-digit', month:'short' });
+    if (!monto) { alert('Ingresa un monto válido'); return; }
+    DATA.aportes.push({ socio, monto, fecha });
+    renderSocioData();
+    document.getElementById('aporteMonto').value = '';
 }
 
 function calcularVenta() {
@@ -145,15 +171,11 @@ function agregarGasto() {
     renderKPIs();
     renderSocioData();
     calcularVenta();
-    // Clear form
     document.getElementById('addConcepto').value = '';
     document.getElementById('addDetalle').value = '';
     document.getElementById('addMonto').value = '';
 }
 
-// ============================================================
-// INIT
-// ============================================================
 document.addEventListener('DOMContentLoaded', () => {
     renderKPIs();
     renderExpenses();
