@@ -22,6 +22,8 @@
     <div class="nav-section">Operación</div>
     <div class="nav-item" data-page="alertas" onclick="showPage('alertas')"><span class="nav-icon">🚨</span>Alertas</div>
     <div class="nav-item" data-page="bitacora" onclick="showPage('bitacora')"><span class="nav-icon">📋</span>Bitácora</div>
+    <div class="nav-section">Socio</div>
+    <div class="nav-item" data-page="socio" onclick="showPage('socio')"><span class="nav-icon">🤝</span>Sociedad 50/50</div>
 </div>
 
 <div class="main">
@@ -248,6 +250,58 @@
             <div class="tl-item"><div class="tl-date">11 Mayo 2026</div><div class="tl-text">Proyección alimento (25 días) — <span class="tl-amt">S/ 875</span></div></div>
             <div class="tl-item"><div class="tl-date">11 Mayo 2026</div><div class="tl-text">Limpieza de pozo y corral — <span class="tl-amt">S/ 30</span></div></div>
         </div>
+    </div>
+</div>
+
+<!-- ===== SOCIEDAD 50/50 ===== -->
+<div id="socio" class="page">
+    <div class="page-title">Panel del Socio (50/50)</div>
+    
+    <div class="grid-2">
+        <div class="card" style="border-top: 4px solid var(--purple)">
+            <div class="card-title">Propuesta de Inversión</div>
+            <div style="font-size:13px; color:var(--text2); line-height:1.6">
+                <p>• <strong>Objetivo:</strong> Engorde y rotación rápida de ganado vacuno en Ica.</p>
+                <p>• <strong>Modelo:</strong> Repartición neta de utilidades al 50% para cada socio.</p>
+                <p>• <strong>Transparencia:</strong> Todos los gastos de compra, flete y alimentación se descuentan del ingreso bruto antes de la repartición.</p>
+            </div>
+        </div>
+        <div class="card" style="border-top: 4px solid var(--blue)">
+            <div class="card-title">Resumen de Liquidación Proyectada</div>
+            <div class="grid-2" style="gap:10px">
+                <div class="kpi b"><div class="kpi-label">Ingreso Bruto Est.</div><div class="kpi-value" style="font-size:20px">S/ 11,000</div></div>
+                <div class="kpi r"><div class="kpi-label">Inversión Total</div><div class="kpi-value" id="socioInversion" style="font-size:20px">S/ --</div></div>
+            </div>
+            <div class="kpi g" style="margin-top:10px">
+                <div class="kpi-label">Utilidad Neta Total</div>
+                <div class="kpi-value" id="socioUtilidad">S/ --</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px">
+        <div class="card">
+            <div class="card-title">Proyección de Ventas (Precios Acordados)</div>
+            <table>
+                <tr><th>Producto</th><th>Cantidad</th><th>Precio Un.</th><th style="text-align:right">Subtotal</th></tr>
+                <tr><td>Toro Grande (Lote 01)</td><td>1</td><td>S/ 6,500</td><td class="amt" style="color:var(--text)">S/ 6,500</td></tr>
+                <tr><td>Toritos Flacos (Lote 02)</td><td>3</td><td>S/ 1,500</td><td class="amt" style="color:var(--text)">S/ 4,500</td></tr>
+                <tr class="tfoot-row"><td colspan="3" class="total"><strong>TOTAL BRUTO</strong></td><td class="amt total" style="color:var(--blue)"><strong>S/ 11,000</strong></td></tr>
+            </table>
+        </div>
+        <div class="card">
+            <div class="card-title">Repartición por Socio (Neto)</div>
+            <div style="padding: 20px; background: rgba(139, 92, 246, 0.1); border-radius: 12px; border: 1px dashed var(--purple); text-align: center;">
+                <div style="font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px">Cada Socio Recibe</div>
+                <div id="socioPagoCadaUno" style="font-size:32px; font-weight:800; color:var(--purple); margin: 10px 0;">S/ --</div>
+                <div style="font-size:11px; color:var(--text2)">Cálculo: (Venta Bruta - Gastos Totales) / 2</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+        <div class="card-title">Avance de la Operación</div>
+        <div class="alert info"><div class="alert-icon">📈</div><div><strong>Estado actual:</strong> 4 animales en corral. El Lote 01 está listo para salida. El Lote 02 ha iniciado su etapa de recuperación y engorde de bajo costo.</div></div>
     </div>
 </div>
 

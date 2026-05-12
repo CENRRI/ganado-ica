@@ -42,7 +42,8 @@ function showPage(pageId) {
 // ============================================================
 function renderKPIs() {
     const inv = totalInvertido();
-    const ganancia = 6300 - inv;
+    const ventaBruta = 11000; // Toro 6500 + 3 Toritos 4500
+    const ganancia = ventaBruta - inv;
     const roi = (ganancia / inv * 100);
     document.getElementById('kpiGanancia').textContent = `S/ ${ganancia.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
     document.getElementById('kpiRoi').textContent = `${roi.toFixed(1)}%`;
@@ -52,6 +53,7 @@ function renderKPIs() {
 
 function renderExpenses() {
     const tbody = document.getElementById('expensesBody');
+    if (!tbody) return;
     tbody.innerHTML = '';
     DATA.gastos.forEach(g => {
         const icon = g.tipo === 'compra' ? '🐂' : g.tipo === 'transporte' ? '🚚' : g.tipo === 'alimentacion' ? '🌾' : g.tipo === 'medicina' ? '💊' : '📦';
@@ -74,6 +76,21 @@ function renderExpenses() {
     document.getElementById('catOtro').textContent = `S/ ${(cats.otro||0).toFixed(2)}`;
 }
 
+function renderSocioData() {
+    const inv = totalInvertido();
+    const ventaBruta = 11000;
+    const utilidadNeta = ventaBruta - inv;
+    const porSocio = utilidadNeta / 2;
+
+    const invEl = document.getElementById('socioInversion');
+    const utilEl = document.getElementById('socioUtilidad');
+    const pagoEl = document.getElementById('socioPagoCadaUno');
+
+    if (invEl) invEl.textContent = `S/ ${inv.toFixed(2)}`;
+    if (utilEl) utilEl.textContent = `S/ ${utilidadNeta.toFixed(2)}`;
+    if (pagoEl) pagoEl.textContent = `S/ ${porSocio.toFixed(2)}`;
+}
+
 function calcularVenta() {
     const pv = parseFloat(document.getElementById('precioVenta').value) || 0;
     const dias = parseInt(document.getElementById('diasExtra').value) || 0;
@@ -85,6 +102,7 @@ function calcularVenta() {
     const box = document.getElementById('resultBox');
     const val = document.getElementById('resultGanancia');
     const roiEl = document.getElementById('resultRoi');
+    if (!box) return;
     if (ganancia >= 0) {
         box.classList.remove('loss');
         val.textContent = `S/ ${ganancia.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
@@ -106,6 +124,7 @@ function agregarGasto() {
     DATA.gastos.push({ fecha, tipo, concepto, detalle, monto });
     renderExpenses();
     renderKPIs();
+    renderSocioData();
     calcularVenta();
     // Clear form
     document.getElementById('addConcepto').value = '';
@@ -119,6 +138,7 @@ function agregarGasto() {
 document.addEventListener('DOMContentLoaded', () => {
     renderKPIs();
     renderExpenses();
+    renderSocioData();
     calcularVenta();
     showPage('resumen');
 });
