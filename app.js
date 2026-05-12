@@ -1,36 +1,64 @@
 // ============================================================
-// DATA STORE
+// CONFIGURACIÓN DE PERSISTENCIA (GITHUB API)
 // ============================================================
-const DATA = {
-    compra: 4500,
-    gastos: [
-        { fecha:'06-May 2026', tipo:'compra', concepto:'Compra del Torito', detalle:'Adquisición', monto:4500 },
-        { fecha:'06-May 2026', tipo:'transporte', concepto:'Flete', detalle:'Transporte al corral', monto:90 },
-        { fecha:'06-May 18:16', tipo:'alimentacion', concepto:'Alimento Urgencia', detalle:'Acemita 4kg (S/7.20) + Afrecho 1kg (S/1.70) + Polvillo 1kg (S/1.90)', monto:10.80 },
-        { fecha:'sem 6 - 10/May', tipo:'transporte', concepto:'Transporte', detalle:'Transporte compras, corral, etc', monto:60.00 },
-        { fecha:'07-May 2026', tipo:'compra', concepto:'Compra toritos', detalle:'Compra toritos x 3', monto:3000.00 },
-        { fecha:'07-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'Concentrado - AGROMARCO 60kg', monto:54.00 },
-        { fecha:'08-May 2026', tipo:'otro', concepto:'Agua', detalle:'Agua bebederos - Asociación', monto:7.50 },
-        { fecha:'09-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'Concentrado - AGROMARCO 60kg', monto:54.00 },
-        { fecha:'11-May 2026', tipo:'alimentacion', concepto:'Proyección Alimento', detalle:'Ración diaria (S/35) x 25 días', monto:875.00 },
-        { fecha:'11-May 2026', tipo:'otro', concepto:'Limpieza', detalle:'Limpieza de pozo y corral', monto:30.00 },
-    ],
-    aportes: [
-        { socio:'Socio A', monto:1500, fecha:'12-may' },
-        { socio:'Socio A', monto:3000, fecha:'12-may' },
-        { socio:'Socio A', monto:365.65, fecha:'12-may' },
-        { socio:'Socio B', monto:3000, fecha:'12-may' }
-    ], 
-    costoDiario: 17.50,
-    fechaInicio: new Date('2026-05-06')
+const CONFIG = {
+    repo: 'CENRRI/ganado-ica',
+    path: 'dashboard/data.json',
+    token: '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' 
 };
+
+let DATA = { gastos: [], aportes: [] };
+
+async function loadData() {
+    try {
+        const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}`, {
+            headers: { 'Authorization': `token ${CONFIG.token}`, 'Cache-Control': 'no-cache' }
+        });
+        const json = await res.json();
+        const content = atob(json.content);
+        DATA = JSON.parse(content);
+        DATA.sha = json.sha; // Guardamos el SHA para poder actualizar después
+        renderAll();
+    } catch (e) {
+        console.error("Error cargando datos:", e);
+        // Fallback a datos locales si falla la API
+        DATA = { gastos: [], aportes: [] };
+    }
+}
+
+async function saveData() {
+    try {
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 4))));
+        const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}`, {
+            method: 'PUT',
+            headers: { 'Authorization': `token ${CONFIG.token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: "Update data from dashboard",
+                content: content,
+                sha: DATA.sha
+            })
+        });
+        const json = await res.json();
+        DATA.sha = json.content.sha; // Actualizamos el SHA para el siguiente guardado
+        console.log("Datos guardados en GitHub");
+    } catch (e) {
+        console.error("Error guardando datos:", e);
+        alert("Error al guardar en la nube. Intenta de nuevo.");
+    }
+}
+
+// ============================================================
+// CORE LOGIC
+// ============================================================
+const COSTO_DIARIO = 17.50;
+const FECHA_INICIO = new Date('2026-05-06');
 
 function totalInvertido() {
     return DATA.gastos.reduce((sum, g) => sum + g.monto, 0);
 }
 
 function diasEnCorral() {
-    return Math.max(1, Math.ceil((new Date() - DATA.fechaInicio) / (1000*60*60*24)));
+    return Math.max(1, Math.ceil((new Date() - FECHA_INICIO) / (1000*60*60*24)));
 }
 
 // ============================================================
@@ -162,7 +190,6 @@ function updateStatusSocio(socioId, actual, ideal) {
 }
 
 function formatFecha(txt) {
-    // Si es tipo 9/5/26 o 09/05/2026
     const parts = txt.split('/');
     if (parts.length === 3) {
         const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -171,7 +198,7 @@ function formatFecha(txt) {
         let y = parts[2].length === 2 ? "20" + parts[2] : parts[2];
         return `${d}-${m} ${y}`;
     }
-    return txt; // Si no coincide, devolver original
+    return txt;
 }
 
 function agregarGasto() {
@@ -186,8 +213,8 @@ function agregarGasto() {
     
     DATA.gastos.push({ fecha, tipo, concepto, detalle, monto });
     renderAll();
+    saveData(); // GUARDAR EN GITHUB
     
-    // Limpiar campos
     document.getElementById('addConcepto').value = '';
     document.getElementById('addDetalle').value = '';
     document.getElementById('addMonto').value = '';
@@ -201,11 +228,24 @@ function registrarAporte() {
     if (!monto) { alert('Ingresa un monto válido'); return; }
     DATA.aportes.push({ socio, monto, fecha });
     renderSocioData();
+    saveData(); // GUARDAR EN GITHUB
     document.getElementById('aporteMonto').value = '';
 }
 
-function eliminarGasto(idx) { if(confirm('¿Eliminar este gasto?')) { DATA.gastos.splice(idx, 1); renderAll(); } }
-function eliminarAporte(idx) { if(confirm('¿Eliminar este aporte?')) { DATA.aportes.splice(idx, 1); renderSocioData(); } }
+function eliminarGasto(idx) { 
+    if(confirm('¿Eliminar este gasto?')) { 
+        DATA.gastos.splice(idx, 1); 
+        renderAll(); 
+        saveData(); 
+    } 
+}
+function eliminarAporte(idx) { 
+    if(confirm('¿Eliminar este aporte?')) { 
+        DATA.aportes.splice(idx, 1); 
+        renderSocioData(); 
+        saveData(); 
+    } 
+}
 
 function renderAll() {
     renderKPIs();
@@ -218,7 +258,7 @@ function calcularVenta() {
     const pv = parseFloat(document.getElementById('precioVenta').value) || 0;
     const dias = parseInt(document.getElementById('diasExtra').value) || 0;
     const extras = parseFloat(document.getElementById('gastosExtra').value) || 0;
-    const costoAlim = dias * DATA.costoDiario;
+    const costoAlim = dias * COSTO_DIARIO;
     const invTotal = totalInvertido() + costoAlim + extras;
     const ganancia = pv - invTotal;
     const roi = (ganancia / invTotal * 100);
@@ -238,6 +278,5 @@ function calcularVenta() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderAll();
-    showPage('resumen');
+    loadData(); // CARGAR DESDE GITHUB AL INICIAR
 });

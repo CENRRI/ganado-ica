@@ -1,0 +1,20 @@
+{
+    "gastos": [
+        { "fecha":"06-May 2026", "tipo":"compra", "concepto":"Compra del Torito", "detalle":"Adquisición", "monto":4500 },
+        { "fecha":"06-May 2026", "tipo":"transporte", "concepto":"Flete", "detalle":"Transporte al corral", "monto":90 },
+        { "fecha":"06-May 18:16", "tipo":"alimentacion", "concepto":"Alimento Urgencia", "detalle":"Acemita 4kg (S/7.20) + Afrecho 1kg (S/1.70) + Polvillo 1kg (S/1.90)", "monto":10.80 },
+        { "fecha":"sem 6 - 10/May", "tipo":"transporte", "concepto":"Transporte", "detalle":"Transporte compras, corral, etc", "monto":60.00 },
+        { "fecha":"07-May 2026", "tipo":"compra", "concepto":"Compra toritos", "detalle":"Compra toritos x 3", "monto":3000.00 },
+        { "fecha":"07-May 2026", "tipo":"alimentacion", "concepto":"Concentrado", "detalle":"Concentrado - AGROMARCO 60kg", "monto":54.00 },
+        { "fecha":"08-May 2026", "tipo":"otro", "concepto":"Agua", "detalle":"Agua bebederos - Asociación", "monto":7.50 },
+        { "fecha":"09-May 2026", "tipo":"alimentacion", "concepto":"Concentrado", "detalle":"Concentrado - AGROMARCO 60kg", "monto":54.00 },
+        { "fecha":"11-May 2026", "tipo":"alimentacion", "concepto":"Proyección Alimento", "detalle":"Ración diaria (S/35) x 25 días", "monto":875.00 },
+        { "fecha":"11-May 2026", "tipo":"otro", "concepto":"Limpieza", "detalle":"Limpieza de pozo y corral", "monto":30.00 }
+    ],
+    "aportes": [
+        { "socio":"Socio A", "monto":1500, "fecha":"12-may" },
+        { "socio":"Socio A", "monto":3000, "fecha":"12-may" },
+        { "socio":"Socio A", "monto":365.65, "fecha":"12-may" },
+        { "socio":"Socio B", "monto":3000, "fecha":"12-may" }
+    ]
+}
