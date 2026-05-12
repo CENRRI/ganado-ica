@@ -7,7 +7,27 @@ const CONFIG = {
     token: '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' 
 };
 
-let DATA = { gastos: [], aportes: [] };
+// Datos de respaldo por si falla la carga inicial
+let DATA = {
+    gastos: [
+        { fecha:'06-May 2026', tipo:'compra', concepto:'Compra del Torito', detalle:'Adquisición', monto:4500 },
+        { fecha:'06-May 2026', tipo:'transporte', concepto:'Flete', detalle:'Transporte al corral', monto:90 },
+        { fecha:'06-May 18:16', tipo:'alimentacion', concepto:'Alimento Urgencia', detalle:'Acemita 4kg (S/7.20) + Afrecho 1kg (S/1.70) + Polvillo 1kg (S/1.90)', monto:10.80 },
+        { fecha:'sem 6 - 10/May', tipo:'transporte', concepto:'Transporte', detalle:'Transporte compras, corral, etc', monto:60.00 },
+        { fecha:'07-May 2026', tipo:'compra', concepto:'Compra toritos', detalle:'Compra toritos x 3', monto:3000.00 },
+        { fecha:'07-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'Concentrado - AGROMARCO 60kg', monto:54.00 },
+        { fecha:'08-May 2026', tipo:'otro', concepto:'Agua', detalle:'Agua bebederos - Asociación', monto:7.50 },
+        { fecha:'09-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'Concentrado - AGROMARCO 60kg', monto:54.00 },
+        { fecha:'11-May 2026', tipo:'alimentacion', concepto:'Proyección Alimento', detalle:'Ración diaria (S/35) x 25 días', monto:875.00 },
+        { fecha:'11-May 2026', tipo:'otro', concepto:'Limpieza', detalle:'Limpieza de pozo y corral', monto:30.00 }
+    ],
+    aportes: [
+        { socio:'Socio A', monto:1500, fecha:'12-may' },
+        { socio:'Socio A', monto:3000, fecha:'12-may' },
+        { socio:'Socio A', monto:365.65, fecha:'12-may' },
+        { socio:'Socio B', monto:3000, fecha:'12-may' }
+    ]
+};
 
 async function loadData() {
     try {
@@ -15,20 +35,23 @@ async function loadData() {
             headers: { 'Authorization': `token ${CONFIG.token}`, 'Cache-Control': 'no-cache' }
         });
         const json = await res.json();
-        const content = atob(json.content);
-        DATA = JSON.parse(content);
-        DATA.sha = json.sha; // Guardamos el SHA para poder actualizar después
-        renderAll();
+        if (json.content) {
+            const decodedContent = decodeURIComponent(escape(atob(json.content)));
+            const cloudData = JSON.parse(decodedContent);
+            DATA = cloudData;
+            DATA.sha = json.sha; 
+        }
     } catch (e) {
-        console.error("Error cargando datos:", e);
-        // Fallback a datos locales si falla la API
-        DATA = { gastos: [], aportes: [] };
+        console.warn("Usando datos de respaldo:", e);
+    } finally {
+        renderAll();
     }
 }
 
 async function saveData() {
     try {
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 4))));
+        const jsonString = JSON.stringify(DATA, null, 4);
+        const content = btoa(unescape(encodeURIComponent(jsonString)));
         const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}`, {
             method: 'PUT',
             headers: { 'Authorization': `token ${CONFIG.token}`, 'Content-Type': 'application/json' },
@@ -39,11 +62,10 @@ async function saveData() {
             })
         });
         const json = await res.json();
-        DATA.sha = json.content.sha; // Actualizamos el SHA para el siguiente guardado
-        console.log("Datos guardados en GitHub");
+        if (json.content) DATA.sha = json.content.sha;
     } catch (e) {
-        console.error("Error guardando datos:", e);
-        alert("Error al guardar en la nube. Intenta de nuevo.");
+        console.error("Error guardando:", e);
+        alert("Error al guardar. Intenta de nuevo.");
     }
 }
 
@@ -66,7 +88,7 @@ function diasEnCorral() {
 // ============================================================
 function toggleMenu() {
     const sb = document.getElementById('sidebar');
-    sb.classList.toggle('open');
+    if(sb) sb.classList.toggle('open');
 }
 
 function showPage(pageId) {
@@ -92,10 +114,16 @@ function renderKPIs() {
     const ventaBruta = 11000;
     const ganancia = ventaBruta - inv;
     const roi = (ganancia / inv * 100);
-    document.getElementById('kpiGanancia').textContent = `S/ ${ganancia.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
-    document.getElementById('kpiRoi').textContent = `${roi.toFixed(1)}%`;
-    document.getElementById('kpiDias').textContent = diasEnCorral();
-    document.getElementById('kpiInversion').textContent = `S/ ${inv.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
+    
+    const elGanancia = document.getElementById('kpiGanancia');
+    const elRoi = document.getElementById('kpiRoi');
+    const elDias = document.getElementById('kpiDias');
+    const elInv = document.getElementById('kpiInversion');
+
+    if(elGanancia) elGanancia.textContent = `S/ ${ganancia.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
+    if(elRoi) elRoi.textContent = `${roi.toFixed(1)}%`;
+    if(elDias) elDias.textContent = diasEnCorral();
+    if(elInv) elInv.textContent = `S/ ${inv.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
 }
 
 function renderExpenses() {
@@ -114,15 +142,23 @@ function renderExpenses() {
             </td>
         </tr>`;
     });
-    document.getElementById('totalInvertido').textContent = `S/ ${totalInvertido().toFixed(2)}`;
+    const elTotal = document.getElementById('totalInvertido');
+    if(elTotal) elTotal.textContent = `S/ ${totalInvertido().toFixed(2)}`;
     
     const cats = {compra:0, transporte:0, alimentacion:0, medicina:0, otro:0};
-    DATA.gastos.forEach(g => { cats[g.tipo] = (cats[g.tipo]||0) + g.monto; });
-    document.getElementById('catCompra').textContent = `S/ ${cats.compra.toFixed(2)}`;
-    document.getElementById('catTransporte').textContent = `S/ ${cats.transporte.toFixed(2)}`;
-    document.getElementById('catAlimentacion').textContent = `S/ ${cats.alimentacion.toFixed(2)}`;
-    document.getElementById('catMedicina').textContent = `S/ ${(cats.medicina||0).toFixed(2)}`;
-    document.getElementById('catOtro').textContent = `S/ ${(cats.otro||0).toFixed(2)}`;
+    DATA.gastos.forEach(g => { if(cats[g.tipo] !== undefined) cats[g.tipo] += g.monto; });
+    
+    const cCompra = document.getElementById('catCompra');
+    const cTrans = document.getElementById('catTransporte');
+    const cAlim = document.getElementById('catAlimentacion');
+    const cMed = document.getElementById('catMedicina');
+    const cOtro = document.getElementById('catOtro');
+
+    if(cCompra) cCompra.textContent = `S/ ${cats.compra.toFixed(2)}`;
+    if(cTrans) cTrans.textContent = `S/ ${cats.transporte.toFixed(2)}`;
+    if(cAlim) cAlim.textContent = `S/ ${cats.alimentacion.toFixed(2)}`;
+    if(cMed) cMed.textContent = `S/ ${cats.medicina.toFixed(2)}`;
+    if(cOtro) cOtro.textContent = `S/ ${cats.otro.toFixed(2)}`;
 }
 
 function renderSocioData() {
@@ -131,14 +167,23 @@ function renderSocioData() {
     const utilidadNeta = ventaBruta - inv;
     const porSocioIdeal = (inv + 1050) / 2;
 
-    document.getElementById('socioInversion').textContent = `S/ ${inv.toFixed(2)}`;
-    document.getElementById('socioUtilidad').textContent = `S/ ${utilidadNeta.toFixed(2)}`;
-    document.getElementById('socioPagoCadaUno').textContent = `S/ ${(utilidadNeta / 2).toFixed(2)}`;
+    const elSI = document.getElementById('socioInversion');
+    const elSU = document.getElementById('socioUtilidad');
+    const elSP = document.getElementById('socioPagoCadaUno');
     
-    document.getElementById('socioInvEjecutada').textContent = `S/ ${inv.toFixed(2)}`;
-    document.getElementById('socioFondoReserva').textContent = `S/ 1,050.00`;
-    document.getElementById('socioTotalFondear').textContent = `S/ ${(inv + 1050).toFixed(2)}`;
-    document.getElementById('socioAporteCadaUno').textContent = `S/ ${porSocioIdeal.toFixed(2)}`;
+    if(elSI) elSI.textContent = `S/ ${inv.toFixed(2)}`;
+    if(elSU) elSU.textContent = `S/ ${utilidadNeta.toFixed(2)}`;
+    if(elSP) elSP.textContent = `S/ ${(utilidadNeta / 2).toFixed(2)}`;
+    
+    const elSE = document.getElementById('socioInvEjecutada');
+    const elFR = document.getElementById('socioFondoReserva');
+    const elTF = document.getElementById('socioTotalFondear');
+    const elAC = document.getElementById('socioAporteCadaUno');
+
+    if(elSE) elSE.textContent = `S/ ${inv.toFixed(2)}`;
+    if(elFR) elFR.textContent = `S/ 1,050.00`;
+    if(elTF) elTF.textContent = `S/ ${(inv + 1050).toFixed(2)}`;
+    if(elAC) elAC.textContent = `S/ ${porSocioIdeal.toFixed(2)}`;
 
     const listaG = document.getElementById('socioListaGastos');
     if(listaG) {
@@ -168,8 +213,10 @@ function renderSocioData() {
                 </div>
             `;
         });
-        document.getElementById('totalAporteA').textContent = `S/ ${tA.toFixed(2)}`;
-        document.getElementById('totalAporteB').textContent = `S/ ${tB.toFixed(2)}`;
+        const elTA = document.getElementById('totalAporteA');
+        const elTB = document.getElementById('totalAporteB');
+        if(elTA) elTA.textContent = `S/ ${tA.toFixed(2)}`;
+        if(elTB) elTB.textContent = `S/ ${tB.toFixed(2)}`;
         updateStatusSocio('A', tA, porSocioIdeal);
         updateStatusSocio('B', tB, porSocioIdeal);
     }
@@ -194,7 +241,8 @@ function formatFecha(txt) {
     if (parts.length === 3) {
         const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         let d = parts[0].padStart(2, '0');
-        let m = meses[parseInt(parts[1]) - 1];
+        let mIdx = parseInt(parts[1]) - 1;
+        let m = meses[mIdx] || "May";
         let y = parts[2].length === 2 ? "20" + parts[2] : parts[2];
         return `${d}-${m} ${y}`;
     }
@@ -213,7 +261,7 @@ function agregarGasto() {
     
     DATA.gastos.push({ fecha, tipo, concepto, detalle, monto });
     renderAll();
-    saveData(); // GUARDAR EN GITHUB
+    saveData();
     
     document.getElementById('addConcepto').value = '';
     document.getElementById('addDetalle').value = '';
@@ -228,8 +276,9 @@ function registrarAporte() {
     if (!monto) { alert('Ingresa un monto válido'); return; }
     DATA.aportes.push({ socio, monto, fecha });
     renderSocioData();
-    saveData(); // GUARDAR EN GITHUB
-    document.getElementById('aporteMonto').value = '';
+    saveData();
+    const elAM = document.getElementById('aporteMonto');
+    if(elAM) elAM.value = '';
 }
 
 function eliminarGasto(idx) { 
@@ -278,5 +327,5 @@ function calcularVenta() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadData(); // CARGAR DESDE GITHUB AL INICIAR
+    loadData();
 });
