@@ -81,14 +81,33 @@ function renderSocioData() {
     const ventaBruta = 11000;
     const utilidadNeta = ventaBruta - inv;
     const porSocio = utilidadNeta / 2;
+    
+    // Fondo de reserva: 30 días x S/ 35
+    const fondoReserva = 1050; 
+    const totalFondear = inv + fondoReserva;
+    const aporteSocio = totalFondear / 2;
 
-    const invEl = document.getElementById('socioInversion');
-    const utilEl = document.getElementById('socioUtilidad');
-    const pagoEl = document.getElementById('socioPagoCadaUno');
+    document.getElementById('socioInversion').textContent = `S/ ${inv.toFixed(2)}`;
+    document.getElementById('socioUtilidad').textContent = `S/ ${utilidadNeta.toFixed(2)}`;
+    document.getElementById('socioPagoCadaUno').textContent = `S/ ${porSocio.toFixed(2)}`;
+    
+    // Nueva sección de aportes
+    document.getElementById('socioInvEjecutada').textContent = `S/ ${inv.toFixed(2)}`;
+    document.getElementById('socioFondoReserva').textContent = `S/ ${fondoReserva.toFixed(2)}`;
+    document.getElementById('socioTotalFondear').textContent = `S/ ${totalFondear.toFixed(2)}`;
+    document.getElementById('socioAporteCadaUno').textContent = `S/ ${aporteSocio.toFixed(2)}`;
 
-    if (invEl) invEl.textContent = `S/ ${inv.toFixed(2)}`;
-    if (utilEl) utilEl.textContent = `S/ ${utilidadNeta.toFixed(2)}`;
-    if (pagoEl) pagoEl.textContent = `S/ ${porSocio.toFixed(2)}`;
+    // Lista simplificada de gastos para el socio
+    const lista = document.getElementById('socioListaGastos');
+    lista.innerHTML = '';
+    DATA.gastos.slice().reverse().forEach(g => {
+        lista.innerHTML += `
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
+                <span>${g.fecha} - ${g.concepto}</span>
+                <span style="color:var(--text)">S/ ${g.monto.toFixed(2)}</span>
+            </div>
+        `;
+    });
 }
 
 function calcularVenta() {

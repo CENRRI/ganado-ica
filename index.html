@@ -299,6 +299,30 @@
         </div>
     </div>
 
+    <div class="grid-2" style="margin-top:16px">
+        <div class="card" style="border-top: 4px solid var(--amber)">
+            <div class="card-title">Aportes y Fondo de Reserva</div>
+            <table style="margin-bottom:12px">
+                <tr><td>Inversión Actual Ejecutada</td><td class="amt" id="socioInvEjecutada">S/ --</td></tr>
+                <tr><td>Fondo Reserva (1 Mes Alimento)</td><td class="amt" id="socioFondoReserva">S/ 1,050</td></tr>
+                <tr class="tfoot-row"><td class="total">Total a Fondear</td><td class="amt total" id="socioTotalFondear" style="color:var(--amber)">S/ --</td></tr>
+            </table>
+            <div style="padding: 12px; background: rgba(245, 158, 11, 0.05); border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:700">
+                    <span>Aporte por Socio (50%)</span>
+                    <span id="socioAporteCadaUno" style="color:var(--amber)">S/ --</span>
+                </div>
+                <p style="font-size:10px; color:var(--muted); margin-top:4px">* Incluye S/ 525 de reserva para alimento por socio.</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Historial de Gastos Compartidos</div>
+            <div id="socioListaGastos" style="max-height:200px; overflow-y:auto; font-size:12px; color:var(--text2)">
+                <!-- Se llena con JS -->
+            </div>
+        </div>
+    </div>
+
     <div class="card" style="margin-top:16px">
         <div class="card-title">Avance de la Operación</div>
         <div class="alert info"><div class="alert-icon">📈</div><div><strong>Estado actual:</strong> 4 animales en corral. El Lote 01 está listo para salida. El Lote 02 ha iniciado su etapa de recuperación y engorde de bajo costo.</div></div>
