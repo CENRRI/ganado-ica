@@ -161,8 +161,22 @@ function updateStatusSocio(socioId, actual, ideal) {
     }
 }
 
+function formatFecha(txt) {
+    // Si es tipo 9/5/26 o 09/05/2026
+    const parts = txt.split('/');
+    if (parts.length === 3) {
+        const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let d = parts[0].padStart(2, '0');
+        let m = meses[parseInt(parts[1]) - 1];
+        let y = parts[2].length === 2 ? "20" + parts[2] : parts[2];
+        return `${d}-${m} ${y}`;
+    }
+    return txt; // Si no coincide, devolver original
+}
+
 function agregarGasto() {
-    const fecha = document.getElementById('addFecha').value || new Date().toLocaleDateString('es-PE');
+    const rawFecha = document.getElementById('addFecha').value;
+    const fecha = rawFecha ? formatFecha(rawFecha) : new Date().toLocaleDateString('es-PE');
     const tipo = document.getElementById('addTipo').value;
     const concepto = document.getElementById('addConcepto').value;
     const detalle = document.getElementById('addDetalle').value;
@@ -177,6 +191,7 @@ function agregarGasto() {
     document.getElementById('addConcepto').value = '';
     document.getElementById('addDetalle').value = '';
     document.getElementById('addMonto').value = '';
+    document.getElementById('addFecha').value = '';
 }
 
 function registrarAporte() {

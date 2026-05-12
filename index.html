@@ -188,10 +188,11 @@
             <tbody id="expensesBody"></tbody>
             <tfoot><tr class="tfoot-row"><td colspan="3" class="total" style="text-align:right"><strong>TOTAL INVERTIDO</strong></td><td class="amt total" id="totalInvertido" style="font-size:16px;color:var(--text)">S/ 8,681.30</td></tr></tfoot>
         </table>
-        <div class="add-form">
-            <div><label>Fecha</label><input type="text" id="addFecha" placeholder="07-May"></div>
-            <div><label>Concepto</label><input type="text" id="addConcepto" placeholder="Ej: Alimento diario"></div>
-            <div><label>Detalle</label><input type="text" id="addDetalle" placeholder="Ej: Soya 1kg + Maíz 2kg"></div>
+        <div class="add-form" style="grid-template-columns: 100px 1fr 1fr 100px 100px 100px; gap:8px">
+            <div><label>Fecha</label><input type="text" id="addFecha" placeholder="9/5/26"></div>
+            <div><label>Concepto</label><input type="text" id="addConcepto" placeholder="Ej: Soga"></div>
+            <div><label>Detalle</label><input type="text" id="addDetalle" placeholder="Ej: Lasar"></div>
+            <div><label>Monto (S/)</label><input type="number" id="addMonto" placeholder="0.00"></div>
             <div><label>Tipo</label><select id="addTipo"><option value="alimentacion">Alimentación</option><option value="medicina">Medicina</option><option value="transporte">Transporte</option><option value="otro">Otro</option></select></div>
             <div><label>&nbsp;</label><button class="btn btn-green" onclick="agregarGasto()">+ Agregar</button></div>
         </div>
