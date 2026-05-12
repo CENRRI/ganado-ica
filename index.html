@@ -6,8 +6,9 @@
 <title>Operación Torito 01</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+<div id="imageModal" class="modal" onclick="this.style.display='none'">
+    <img class="modal-content" id="imgFull">
+</div>
 
 <div class="sidebar">
     <div class="sidebar-logo">TORITO 01</div>
@@ -61,7 +62,7 @@
         <div class="card-title" style="color:var(--green)">LOTE 01: Torete Líder (Holstein Rojo)</div>
         <div class="animal-grid">
             <div>
-                <img src="frame_q1.jpg" class="animal-photo">
+                <img src="frame_q1.jpg" class="animal-photo" onclick="openModal(this.src)">
             </div>
             <div>
                 <div class="spec-grid">
@@ -82,8 +83,8 @@
     <div class="card" style="border-top:4px solid var(--amber)">
         <div class="card-title" style="color:var(--amber)">LOTE 02: 3 Toritos Flacos (Nuevos Ingresos)</div>
         <div class="animal-grid">
-            <div style="display:flex; justify-content:center">
-                <img src="lote02_1.jpg" class="animal-photo" style="height:250px; width:100%; object-fit:cover; border-radius:12px">
+            <div>
+                <img src="lote02_1.jpg" class="animal-photo" onclick="openModal(this.src)">
             </div>
             <div>
                 <div class="spec-grid">
@@ -253,5 +254,13 @@
 
 </div>
 <script src="app.js"></script>
+<script>
+function openModal(src) {
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('imgFull');
+    modal.style.display = "flex";
+    modalImg.src = src;
+}
+</script>
 </body>
 </html>
