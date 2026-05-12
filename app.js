@@ -15,7 +15,11 @@ const DATA = {
         { fecha:'11-May 2026', tipo:'alimentacion', concepto:'Proyección Alimento', detalle:'Ración diaria (S/35) x 25 días', monto:875.00 },
         { fecha:'11-May 2026', tipo:'otro', concepto:'Limpieza', detalle:'Limpieza de pozo y corral', monto:30.00 },
     ],
-    aportes: [], 
+    aportes: [
+        { socio:'Socio A', monto:1500, fecha:'12-may' },
+        { socio:'Socio A', monto:3000, fecha:'12-may' },
+        { socio:'Socio B', monto:3000, fecha:'12-may' }
+    ], 
     costoDiario: 17.50,
     fechaInicio: new Date('2026-05-06')
 };
