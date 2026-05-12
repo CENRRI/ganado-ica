@@ -36,8 +36,24 @@ function diasEnCorral() {
 // ============================================================
 // NAVIGATION
 // ============================================================
+function toggleMenu() {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('open');
+}
+
 function showPage(pageId) {
-    // La lógica ahora reside en app.js para evitar duplicidad
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const target = document.getElementById(pageId);
+    if (target) target.classList.add('active');
+    
+    const navItem = document.querySelector(`[data-page="${pageId}"]`);
+    if (navItem) navItem.classList.add('active');
+    
+    if (window.innerWidth <= 900) {
+        const sb = document.getElementById('sidebar');
+        if (sb) sb.classList.remove('open');
+    }
 }
 
 // ============================================================
@@ -85,7 +101,7 @@ function renderSocioData() {
     const inv = totalInvertido();
     const ventaBruta = 11000;
     const utilidadNeta = ventaBruta - inv;
-    const porSocioIdeal = (inv + 1050) / 2; // Meta de fondeo (Gastos + 1 mes alimento)
+    const porSocioIdeal = (inv + 1050) / 2;
 
     document.getElementById('socioInversion').textContent = `S/ ${inv.toFixed(2)}`;
     document.getElementById('socioUtilidad').textContent = `S/ ${utilidadNeta.toFixed(2)}`;
@@ -96,52 +112,71 @@ function renderSocioData() {
     document.getElementById('socioTotalFondear').textContent = `S/ ${(inv + 1050).toFixed(2)}`;
     document.getElementById('socioAporteCadaUno').textContent = `S/ ${porSocioIdeal.toFixed(2)}`;
 
-    // Gastos compartidos
     const listaG = document.getElementById('socioListaGastos');
-    listaG.innerHTML = '';
-    DATA.gastos.slice().reverse().forEach((g, idx) => {
-        const originalIdx = DATA.gastos.length - 1 - idx;
-        listaG.innerHTML += `
-            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
-                <span>${g.fecha} - ${g.concepto}</span>
-                <span>S/ ${g.monto.toFixed(2)} <button onclick="eliminarGasto(${originalIdx})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:4px">❌</button></span>
-            </div>
-        `;
-    });
+    if(listaG) {
+        listaG.innerHTML = '';
+        DATA.gastos.slice().reverse().forEach((g, idx) => {
+            const originalIdx = DATA.gastos.length - 1 - idx;
+            listaG.innerHTML += `
+                <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
+                    <span>${g.fecha} - ${g.concepto}</span>
+                    <span>S/ ${g.monto.toFixed(2)} <button onclick="eliminarGasto(${originalIdx})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:4px">❌</button></span>
+                </div>
+            `;
+        });
+    }
 
-    // Aportes reales y Balance
     const listaA = document.getElementById('socioListaAportes');
-    listaA.innerHTML = '';
-    let tA = 0, tB = 0;
-    DATA.aportes.slice().reverse().forEach((a, idx) => {
-        const originalIdx = DATA.aportes.length - 1 - idx;
-        if (a.socio === 'Socio A') tA += a.monto; else tB += a.monto;
-        listaA.innerHTML += `
-            <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
-                <span><strong style="color:${a.socio === 'Socio A' ? 'var(--blue)' : 'var(--purple)'}">${a.socio}</strong> - ${a.fecha}</span>
-                <span>S/ ${a.monto.toFixed(2)} <button onclick="eliminarAporte(${originalIdx})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:4px">❌</button></span>
-            </div>
-        `;
-    });
-
-    document.getElementById('totalAporteA').textContent = `S/ ${tA.toFixed(2)}`;
-    document.getElementById('totalAporteB').textContent = `S/ ${tB.toFixed(2)}`;
-
-    updateStatusSocio('A', tA, porSocioIdeal);
-    updateStatusSocio('B', tB, porSocioIdeal);
+    if(listaA) {
+        listaA.innerHTML = '';
+        let tA = 0, tB = 0;
+        DATA.aportes.slice().reverse().forEach((a, idx) => {
+            const originalIdx = DATA.aportes.length - 1 - idx;
+            if (a.socio === 'Socio A') tA += a.monto; else tB += a.monto;
+            listaA.innerHTML += `
+                <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
+                    <span><strong style="color:${a.socio === 'Socio A' ? 'var(--blue)' : 'var(--purple)'}">${a.socio}</strong> - ${a.fecha}</span>
+                    <span>S/ ${a.monto.toFixed(2)} <button onclick="eliminarAporte(${originalIdx})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:4px">❌</button></span>
+                </div>
+            `;
+        });
+        document.getElementById('totalAporteA').textContent = `S/ ${tA.toFixed(2)}`;
+        document.getElementById('totalAporteB').textContent = `S/ ${tB.toFixed(2)}`;
+        updateStatusSocio('A', tA, porSocioIdeal);
+        updateStatusSocio('B', tB, porSocioIdeal);
+    }
 }
 
 function updateStatusSocio(socioId, actual, ideal) {
-    const diff = actual - ideal;
     const statusEl = document.getElementById(`statusSocio${socioId}`);
     const cardEl = document.getElementById(`cardSocio${socioId}`);
-    if (diff >= -0.01) { // Tolerancia por decimales
+    if(!statusEl || !cardEl) return;
+    const diff = actual - ideal;
+    if (diff >= -0.01) {
         statusEl.innerHTML = `<span style="color:var(--green)">✓ OK (S/ +${Math.max(0, diff).toFixed(2)})</span>`;
         cardEl.style.borderColor = 'var(--green)';
     } else {
         statusEl.innerHTML = `<span style="color:var(--red)">⚠ DEBE (S/ ${Math.abs(diff).toFixed(2)})</span>`;
         cardEl.style.borderColor = 'var(--red)';
     }
+}
+
+function agregarGasto() {
+    const fecha = document.getElementById('addFecha').value || new Date().toLocaleDateString('es-PE');
+    const tipo = document.getElementById('addTipo').value;
+    const concepto = document.getElementById('addConcepto').value;
+    const detalle = document.getElementById('addDetalle').value;
+    const monto = parseFloat(document.getElementById('addMonto').value);
+    
+    if (!concepto || isNaN(monto)) { alert('Completa concepto y monto correctamente'); return; }
+    
+    DATA.gastos.push({ fecha, tipo, concepto, detalle, monto });
+    renderAll();
+    
+    // Limpiar campos
+    document.getElementById('addConcepto').value = '';
+    document.getElementById('addDetalle').value = '';
+    document.getElementById('addMonto').value = '';
 }
 
 function registrarAporte() {
@@ -187,40 +222,7 @@ function calcularVenta() {
     }
 }
 
-function agregarGasto() {
-    const fecha = document.getElementById('addFecha').value || new Date().toLocaleDateString('es-PE');
-    const tipo = document.getElementById('addTipo').value;
-    const concepto = document.getElementById('addConcepto').value;
-    const detalle = document.getElementById('addDetalle').value;
-    const monto = parseFloat(document.getElementById('addMonto').value);
-    if (!concepto || !monto) { alert('Completa concepto y monto'); return; }
-    DATA.gastos.push({ fecha, tipo, concepto, detalle, monto });
-    renderAll();
-    document.getElementById('addConcepto').value = '';
-    document.getElementById('addDetalle').value = '';
-    document.getElementById('addMonto').value = '';
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     renderAll();
     showPage('resumen');
 });
-
-function toggleMenu() {
-    const sb = document.getElementById('sidebar');
-    sb.classList.toggle('open');
-}
-
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    const navItem = document.querySelector(`[data-page="${pageId}"]`);
-    if (navItem) navItem.classList.add('active');
-    
-    // Cerrar menú en móvil tras click
-    if (window.innerWidth <= 900) {
-        const sb = document.getElementById('sidebar');
-        if (sb) sb.classList.remove('open');
-    }
-}
