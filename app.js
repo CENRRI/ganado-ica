@@ -37,10 +37,7 @@ function diasEnCorral() {
 // NAVIGATION
 // ============================================================
 function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(pageId).classList.add('active');
-    document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
+    // La lógica ahora reside en app.js para evitar duplicidad
 }
 
 // ============================================================
@@ -208,3 +205,22 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAll();
     showPage('resumen');
 });
+
+function toggleMenu() {
+    const sb = document.getElementById('sidebar');
+    sb.classList.toggle('open');
+}
+
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    const navItem = document.querySelector(`[data-page="${pageId}"]`);
+    if (navItem) navItem.classList.add('active');
+    
+    // Cerrar menú en móvil tras click
+    if (window.innerWidth <= 900) {
+        const sb = document.getElementById('sidebar');
+        if (sb) sb.classList.remove('open');
+    }
+}
