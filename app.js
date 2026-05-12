@@ -15,7 +15,7 @@ const DATA = {
         { fecha:'11-May 2026', tipo:'alimentacion', concepto:'Proyección Alimento', detalle:'Ración diaria (S/35) x 25 días', monto:875.00 },
         { fecha:'11-May 2026', tipo:'otro', concepto:'Limpieza', detalle:'Limpieza de pozo y corral', monto:30.00 },
     ],
-    aportes: [], // Historial de aportes reales
+    aportes: [], 
     costoDiario: 17.50,
     fechaInicio: new Date('2026-05-06')
 };
@@ -43,7 +43,7 @@ function showPage(pageId) {
 // ============================================================
 function renderKPIs() {
     const inv = totalInvertido();
-    const ventaBruta = 11000; // Toro 6500 + 3 Toritos 4500
+    const ventaBruta = 11000;
     const ganancia = ventaBruta - inv;
     const roi = (ganancia / inv * 100);
     document.getElementById('kpiGanancia').textContent = `S/ ${ganancia.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
@@ -56,18 +56,20 @@ function renderExpenses() {
     const tbody = document.getElementById('expensesBody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    DATA.gastos.forEach(g => {
+    DATA.gastos.forEach((g, index) => {
         const icon = g.tipo === 'compra' ? '🐂' : g.tipo === 'transporte' ? '🚚' : g.tipo === 'alimentacion' ? '🌾' : g.tipo === 'medicina' ? '💊' : '📦';
         tbody.innerHTML += `<tr>
             <td>${g.fecha}</td>
             <td>${icon} ${g.concepto}</td>
             <td>${g.detalle}</td>
-            <td class="amt">S/ ${g.monto.toFixed(2)}</td>
+            <td class="amt">
+                S/ ${g.monto.toFixed(2)}
+                <button onclick="eliminarGasto(${index})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:8px; opacity:0.5">🗑️</button>
+            </td>
         </tr>`;
     });
     document.getElementById('totalInvertido').textContent = `S/ ${totalInvertido().toFixed(2)}`;
     
-    // Category totals
     const cats = {compra:0, transporte:0, alimentacion:0, medicina:0, otro:0};
     DATA.gastos.forEach(g => { cats[g.tipo] = (cats[g.tipo]||0) + g.monto; });
     document.getElementById('catCompra').textContent = `S/ ${cats.compra.toFixed(2)}`;
@@ -81,49 +83,63 @@ function renderSocioData() {
     const inv = totalInvertido();
     const ventaBruta = 11000;
     const utilidadNeta = ventaBruta - inv;
-    const porSocio = utilidadNeta / 2;
-    
-    // Fondo de reserva: 30 días x S/ 35
-    const fondoReserva = 1050; 
-    const totalFondear = inv + fondoReserva;
-    const aporteSocio = totalFondear / 2;
+    const porSocioIdeal = (inv + 1050) / 2; // Meta de fondeo (Gastos + 1 mes alimento)
 
     document.getElementById('socioInversion').textContent = `S/ ${inv.toFixed(2)}`;
     document.getElementById('socioUtilidad').textContent = `S/ ${utilidadNeta.toFixed(2)}`;
-    document.getElementById('socioPagoCadaUno').textContent = `S/ ${porSocio.toFixed(2)}`;
+    document.getElementById('socioPagoCadaUno').textContent = `S/ ${(utilidadNeta / 2).toFixed(2)}`;
     
     document.getElementById('socioInvEjecutada').textContent = `S/ ${inv.toFixed(2)}`;
-    document.getElementById('socioFondoReserva').textContent = `S/ ${fondoReserva.toFixed(2)}`;
-    document.getElementById('socioTotalFondear').textContent = `S/ ${totalFondear.toFixed(2)}`;
-    document.getElementById('socioAporteCadaUno').textContent = `S/ ${aporteSocio.toFixed(2)}`;
+    document.getElementById('socioFondoReserva').textContent = `S/ 1,050.00`;
+    document.getElementById('socioTotalFondear').textContent = `S/ ${(inv + 1050).toFixed(2)}`;
+    document.getElementById('socioAporteCadaUno').textContent = `S/ ${porSocioIdeal.toFixed(2)}`;
 
     // Gastos compartidos
     const listaG = document.getElementById('socioListaGastos');
     listaG.innerHTML = '';
-    DATA.gastos.slice().reverse().forEach(g => {
+    DATA.gastos.slice().reverse().forEach((g, idx) => {
+        const originalIdx = DATA.gastos.length - 1 - idx;
         listaG.innerHTML += `
             <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
                 <span>${g.fecha} - ${g.concepto}</span>
-                <span style="color:var(--text)">S/ ${g.monto.toFixed(2)}</span>
+                <span>S/ ${g.monto.toFixed(2)} <button onclick="eliminarGasto(${originalIdx})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:4px">❌</button></span>
             </div>
         `;
     });
 
-    // Aportes reales
+    // Aportes reales y Balance
     const listaA = document.getElementById('socioListaAportes');
     listaA.innerHTML = '';
     let tA = 0, tB = 0;
-    DATA.aportes.slice().reverse().forEach(a => {
+    DATA.aportes.slice().reverse().forEach((a, idx) => {
+        const originalIdx = DATA.aportes.length - 1 - idx;
         if (a.socio === 'Socio A') tA += a.monto; else tB += a.monto;
         listaA.innerHTML += `
             <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
                 <span><strong style="color:${a.socio === 'Socio A' ? 'var(--blue)' : 'var(--purple)'}">${a.socio}</strong> - ${a.fecha}</span>
-                <span style="color:var(--text)">S/ ${a.monto.toFixed(2)}</span>
+                <span>S/ ${a.monto.toFixed(2)} <button onclick="eliminarAporte(${originalIdx})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:4px">❌</button></span>
             </div>
         `;
     });
+
     document.getElementById('totalAporteA').textContent = `S/ ${tA.toFixed(2)}`;
     document.getElementById('totalAporteB').textContent = `S/ ${tB.toFixed(2)}`;
+
+    updateStatusSocio('A', tA, porSocioIdeal);
+    updateStatusSocio('B', tB, porSocioIdeal);
+}
+
+function updateStatusSocio(socioId, actual, ideal) {
+    const diff = actual - ideal;
+    const statusEl = document.getElementById(`statusSocio${socioId}`);
+    const cardEl = document.getElementById(`cardSocio${socioId}`);
+    if (diff >= 0) {
+        statusEl.innerHTML = `<span style="color:var(--green)">✓ OK (S/ +${diff.toFixed(2)})</span>`;
+        cardEl.style.borderColor = 'var(--green)';
+    } else {
+        statusEl.innerHTML = `<span style="color:var(--red)">⚠ DEBE (S/ ${Math.abs(diff).toFixed(2)})</span>`;
+        cardEl.style.borderColor = 'var(--red)';
+    }
 }
 
 function registrarAporte() {
@@ -134,6 +150,16 @@ function registrarAporte() {
     DATA.aportes.push({ socio, monto, fecha });
     renderSocioData();
     document.getElementById('aporteMonto').value = '';
+}
+
+function eliminarGasto(idx) { if(confirm('¿Eliminar este gasto?')) { DATA.gastos.splice(idx, 1); renderAll(); } }
+function eliminarAporte(idx) { if(confirm('¿Eliminar este aporte?')) { DATA.aportes.splice(idx, 1); renderSocioData(); } }
+
+function renderAll() {
+    renderKPIs();
+    renderExpenses();
+    renderSocioData();
+    calcularVenta();
 }
 
 function calcularVenta() {
@@ -167,19 +193,13 @@ function agregarGasto() {
     const monto = parseFloat(document.getElementById('addMonto').value);
     if (!concepto || !monto) { alert('Completa concepto y monto'); return; }
     DATA.gastos.push({ fecha, tipo, concepto, detalle, monto });
-    renderExpenses();
-    renderKPIs();
-    renderSocioData();
-    calcularVenta();
+    renderAll();
     document.getElementById('addConcepto').value = '';
     document.getElementById('addDetalle').value = '';
     document.getElementById('addMonto').value = '';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderKPIs();
-    renderExpenses();
-    renderSocioData();
-    calcularVenta();
+    renderAll();
     showPage('resumen');
 });

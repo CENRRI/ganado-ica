@@ -296,6 +296,9 @@
                 <div id="socioPagoCadaUno" style="font-size:32px; font-weight:800; color:var(--purple); margin: 10px 0;">S/ --</div>
                 <div style="font-size:11px; color:var(--text2)">Cálculo: (Venta Bruta - Gastos Totales) / 2</div>
             </div>
+            <div id="balanceGlobal" style="margin-top:16px; font-size:12px; text-align:center">
+                <!-- Se llena con JS -->
+            </div>
         </div>
     </div>
 
@@ -333,8 +336,16 @@
             </div>
             <div style="margin-top:16px">
                 <div class="spec-grid" style="grid-template-columns: 1fr 1fr;">
-                    <div class="spec"><div class="spec-label">Total Socio A</div><div class="spec-value" id="totalAporteA" style="color:var(--text)">S/ 0.00</div></div>
-                    <div class="spec"><div class="spec-label">Total Socio B</div><div class="spec-value" id="totalAporteB" style="color:var(--text)">S/ 0.00</div></div>
+                    <div class="spec" id="cardSocioA">
+                        <div class="spec-label">Total Socio A</div>
+                        <div class="spec-value" id="totalAporteA">S/ 0.00</div>
+                        <div id="statusSocioA" style="font-size:10px; margin-top:4px"></div>
+                    </div>
+                    <div class="spec" id="cardSocioB">
+                        <div class="spec-label">Total Socio B</div>
+                        <div class="spec-value" id="totalAporteB">S/ 0.00</div>
+                        <div id="statusSocioB" style="font-size:10px; margin-top:4px"></div>
+                    </div>
                 </div>
             </div>
         </div>
