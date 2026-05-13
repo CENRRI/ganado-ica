@@ -296,10 +296,25 @@ function eliminarAporte(idx) {
     } 
 }
 
+function renderTimeline() {
+    const list = document.getElementById('timelineList');
+    if (!list) return;
+    list.innerHTML = '';
+    DATA.gastos.forEach(g => {
+        list.innerHTML += `
+            <div class="tl-item">
+                <div class="tl-date">${g.fecha}</div>
+                <div class="tl-text">${g.concepto} - ${g.detalle} — <span class="tl-amt">S/ ${g.monto.toFixed(2)}</span></div>
+            </div>
+        `;
+    });
+}
+
 function renderAll() {
     renderKPIs();
     renderExpenses();
     renderSocioData();
+    renderTimeline();
     calcularVenta();
 }
 
