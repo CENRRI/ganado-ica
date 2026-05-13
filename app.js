@@ -7,7 +7,6 @@ const CONFIG = {
     token: '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' 
 };
 
-// Datos de respaldo por si falla la carga inicial
 let DATA = {
     gastos: [
         { fecha:'06-May 2026', tipo:'compra', concepto:'Compra del Torito', detalle:'Adquisición', monto:4500 },
@@ -31,21 +30,17 @@ let DATA = {
 
 async function loadData() {
     try {
-        const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}`, {
-            headers: { 'Authorization': `token ${CONFIG.token}`, 'Cache-Control': 'no-cache' }
+        const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}?t=${Date.now()}`, {
+            headers: { 'Authorization': `token ${CONFIG.token}` }
         });
         const json = await res.json();
         if (json.content) {
             const decodedContent = decodeURIComponent(escape(atob(json.content)));
-            const cloudData = JSON.parse(decodedContent);
-            DATA = cloudData;
+            DATA = JSON.parse(decodedContent);
             DATA.sha = json.sha; 
         }
-    } catch (e) {
-        console.warn("Usando datos de respaldo:", e);
-    } finally {
-        renderAll();
-    }
+    } catch (e) { console.warn("Error carga nube:", e); }
+    renderAll();
 }
 
 async function saveData() {
@@ -55,75 +50,35 @@ async function saveData() {
         const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}`, {
             method: 'PUT',
             headers: { 'Authorization': `token ${CONFIG.token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message: "Update data from dashboard",
-                content: content,
-                sha: DATA.sha
-            })
+            body: JSON.stringify({ message: "Update via Dashboard", content, sha: DATA.sha })
         });
         const json = await res.json();
         if (json.content) DATA.sha = json.content.sha;
-    } catch (e) {
-        console.error("Error guardando:", e);
-        alert("Error al guardar. Intenta de nuevo.");
-    }
+    } catch (e) { alert("Error al guardar"); }
 }
 
-// ============================================================
-// CORE LOGIC
-// ============================================================
 const COSTO_DIARIO = 17.50;
 const FECHA_INICIO = new Date('2026-05-06');
+function totalInvertido() { return DATA.gastos.reduce((sum, g) => sum + g.monto, 0); }
+function diasEnCorral() { return Math.max(1, Math.ceil((new Date() - FECHA_INICIO) / (1000*60*60*24))); }
 
-function totalInvertido() {
-    return DATA.gastos.reduce((sum, g) => sum + g.monto, 0);
-}
-
-function diasEnCorral() {
-    return Math.max(1, Math.ceil((new Date() - FECHA_INICIO) / (1000*60*60*24)));
-}
-
-// ============================================================
-// NAVIGATION
-// ============================================================
-function toggleMenu() {
-    const sb = document.getElementById('sidebar');
-    if(sb) sb.classList.toggle('open');
-}
-
+function toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); }
 function showPage(pageId) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    const target = document.getElementById(pageId);
-    if (target) target.classList.add('active');
-    
+    document.getElementById(pageId).classList.add('active');
     const navItem = document.querySelector(`[data-page="${pageId}"]`);
     if (navItem) navItem.classList.add('active');
-    
-    if (window.innerWidth <= 900) {
-        const sb = document.getElementById('sidebar');
-        if (sb) sb.classList.remove('open');
-    }
+    if (window.innerWidth <= 900) document.getElementById('sidebar').classList.remove('open');
 }
 
-// ============================================================
-// RENDER FUNCTIONS
-// ============================================================
 function renderKPIs() {
     const inv = totalInvertido();
-    const ventaBruta = 11000;
-    const ganancia = ventaBruta - inv;
-    const roi = (ganancia / inv * 100);
-    
-    const elGanancia = document.getElementById('kpiGanancia');
-    const elRoi = document.getElementById('kpiRoi');
-    const elDias = document.getElementById('kpiDias');
-    const elInv = document.getElementById('kpiInversion');
-
-    if(elGanancia) elGanancia.textContent = `S/ ${ganancia.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
-    if(elRoi) elRoi.textContent = `${roi.toFixed(1)}%`;
-    if(elDias) elDias.textContent = diasEnCorral();
-    if(elInv) elInv.textContent = `S/ ${inv.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
+    const ganancia = 11000 - inv;
+    document.getElementById('kpiGanancia').textContent = `S/ ${ganancia.toFixed(0)}`;
+    document.getElementById('kpiRoi').textContent = `${(ganancia/inv*100).toFixed(1)}%`;
+    document.getElementById('kpiDias').textContent = diasEnCorral();
+    document.getElementById('kpiInversion').textContent = `S/ ${inv.toFixed(2)}`;
 }
 
 function renderExpenses() {
@@ -131,169 +86,48 @@ function renderExpenses() {
     if (!tbody) return;
     tbody.innerHTML = '';
     DATA.gastos.forEach((g, index) => {
-        const icon = g.tipo === 'compra' ? '🐂' : g.tipo === 'transporte' ? '🚚' : g.tipo === 'alimentacion' ? '🌾' : g.tipo === 'medicina' ? '💊' : '📦';
-        tbody.innerHTML += `<tr>
-            <td>${g.fecha}</td>
-            <td>${icon} ${g.concepto}</td>
-            <td>${g.detalle}</td>
-            <td class="amt">
-                S/ ${g.monto.toFixed(2)}
-                <button onclick="eliminarGasto(${index})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:8px; opacity:0.5">🗑️</button>
-            </td>
-        </tr>`;
+        const icon = g.tipo === 'compra' ? '🐂' : g.tipo === 'transporte' ? '🚚' : g.tipo === 'alimentacion' ? '🌾' : '📦';
+        tbody.innerHTML += `<tr><td>${g.fecha}</td><td>${icon} ${g.concepto}</td><td>${g.detalle}</td><td class="amt">S/ ${g.monto.toFixed(2)} <button onclick="eliminarGasto(${index})" style="opacity:0.3;border:none;background:none;cursor:pointer">🗑️</button></td></tr>`;
     });
-    const elTotal = document.getElementById('totalInvertido');
-    if(elTotal) elTotal.textContent = `S/ ${totalInvertido().toFixed(2)}`;
-    
-    const cats = {compra:0, transporte:0, alimentacion:0, medicina:0, otro:0};
-    DATA.gastos.forEach(g => { if(cats[g.tipo] !== undefined) cats[g.tipo] += g.monto; });
-    
-    const cCompra = document.getElementById('catCompra');
-    const cTrans = document.getElementById('catTransporte');
-    const cAlim = document.getElementById('catAlimentacion');
-    const cMed = document.getElementById('catMedicina');
-    const cOtro = document.getElementById('catOtro');
-
-    if(cCompra) cCompra.textContent = `S/ ${cats.compra.toFixed(2)}`;
-    if(cTrans) cTrans.textContent = `S/ ${cats.transporte.toFixed(2)}`;
-    if(cAlim) cAlim.textContent = `S/ ${cats.alimentacion.toFixed(2)}`;
-    if(cMed) cMed.textContent = `S/ ${cats.medicina.toFixed(2)}`;
-    if(cOtro) cOtro.textContent = `S/ ${cats.otro.toFixed(2)}`;
+    document.getElementById('totalInvertido').textContent = `S/ ${totalInvertido().toFixed(2)}`;
 }
 
 function renderSocioData() {
     const inv = totalInvertido();
-    const ventaBruta = 11000;
-    const utilidadNeta = ventaBruta - inv;
-    const porSocioIdeal = (inv + 1050) / 2;
-
-    const elSI = document.getElementById('socioInversion');
-    const elSU = document.getElementById('socioUtilidad');
-    const elSP = document.getElementById('socioPagoCadaUno');
+    const porSocio = (inv + 1050) / 2;
+    document.getElementById('socioInversion').textContent = `S/ ${inv.toFixed(2)}`;
+    document.getElementById('socioUtilidad').textContent = `S/ ${(11000-inv).toFixed(2)}`;
+    document.getElementById('socioPagoCadaUno').textContent = `S/ ${((11000-inv)/2).toFixed(2)}`;
+    document.getElementById('socioTotalFondear').textContent = `S/ ${(inv + 1050).toFixed(2)}`;
+    document.getElementById('socioAporteCadaUno').textContent = `S/ ${porSocio.toFixed(2)}`;
     
-    if(elSI) elSI.textContent = `S/ ${inv.toFixed(2)}`;
-    if(elSU) elSU.textContent = `S/ ${utilidadNeta.toFixed(2)}`;
-    if(elSP) elSP.textContent = `S/ ${(utilidadNeta / 2).toFixed(2)}`;
-    
-    const elSE = document.getElementById('socioInvEjecutada');
-    const elFR = document.getElementById('socioFondoReserva');
-    const elTF = document.getElementById('socioTotalFondear');
-    const elAC = document.getElementById('socioAporteCadaUno');
-
-    if(elSE) elSE.textContent = `S/ ${inv.toFixed(2)}`;
-    if(elFR) elFR.textContent = `S/ 1,050.00`;
-    if(elTF) elTF.textContent = `S/ ${(inv + 1050).toFixed(2)}`;
-    if(elAC) elAC.textContent = `S/ ${porSocioIdeal.toFixed(2)}`;
-
-    const listaG = document.getElementById('socioListaGastos');
-    if(listaG) {
-        listaG.innerHTML = '';
-        DATA.gastos.slice().reverse().forEach((g, idx) => {
-            const originalIdx = DATA.gastos.length - 1 - idx;
-            listaG.innerHTML += `
-                <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
-                    <span>${g.fecha} - ${g.concepto}</span>
-                    <span>S/ ${g.monto.toFixed(2)} <button onclick="eliminarGasto(${originalIdx})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:4px">❌</button></span>
-                </div>
-            `;
-        });
-    }
-
+    // Lista aportes
     const listaA = document.getElementById('socioListaAportes');
     if(listaA) {
         listaA.innerHTML = '';
-        let tA = 0, tB = 0;
+        let tA=0, tB=0;
         DATA.aportes.slice().reverse().forEach((a, idx) => {
-            const originalIdx = DATA.aportes.length - 1 - idx;
-            if (a.socio === 'Socio A') tA += a.monto; else tB += a.monto;
-            listaA.innerHTML += `
-                <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
-                    <span><strong style="color:${a.socio === 'Socio A' ? 'var(--blue)' : 'var(--purple)'}">${a.socio}</strong> - ${a.fecha}</span>
-                    <span>S/ ${a.monto.toFixed(2)} <button onclick="eliminarAporte(${originalIdx})" style="background:none; border:none; cursor:pointer; font-size:10px; margin-left:4px">❌</button></span>
-                </div>
-            `;
+            if(a.socio === 'Socio A') tA += a.monto; else tB += a.monto;
+            listaA.innerHTML += `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #222"><span>${a.socio} - ${a.fecha}</span><span>S/ ${a.monto.toFixed(2)}</span></div>`;
         });
-        const elTA = document.getElementById('totalAporteA');
-        const elTB = document.getElementById('totalAporteB');
-        if(elTA) elTA.textContent = `S/ ${tA.toFixed(2)}`;
-        if(elTB) elTB.textContent = `S/ ${tB.toFixed(2)}`;
-        updateStatusSocio('A', tA, porSocioIdeal);
-        updateStatusSocio('B', tB, porSocioIdeal);
+        document.getElementById('totalAporteA').textContent = `S/ ${tA.toFixed(2)}`;
+        document.getElementById('totalAporteB').textContent = `S/ ${tB.toFixed(2)}`;
+        updateStatusSocio('A', tA, porSocio);
+        updateStatusSocio('B', tB, porSocio);
     }
 }
 
-function updateStatusSocio(socioId, actual, ideal) {
-    const statusEl = document.getElementById(`statusSocio${socioId}`);
-    const cardEl = document.getElementById(`cardSocio${socioId}`);
-    if(!statusEl || !cardEl) return;
+function updateStatusSocio(id, actual, ideal) {
+    const el = document.getElementById(`statusSocio${id}`);
+    const card = document.getElementById(`cardSocio${id}`);
     const diff = actual - ideal;
-    if (diff >= -0.01) {
-        statusEl.innerHTML = `<span style="color:var(--green)">✓ OK (S/ +${Math.max(0, diff).toFixed(2)})</span>`;
-        cardEl.style.borderColor = 'var(--green)';
+    if(diff >= -0.01) {
+        el.innerHTML = `<span style="color:var(--green)">✓ OK</span>`;
+        card.style.borderColor = 'var(--green)';
     } else {
-        statusEl.innerHTML = `<span style="color:var(--red)">⚠ DEBE (S/ ${Math.abs(diff).toFixed(2)})</span>`;
-        cardEl.style.borderColor = 'var(--red)';
+        el.innerHTML = `<span style="color:var(--red)">⚠ DEBE S/ ${Math.abs(diff).toFixed(2)}</span>`;
+        card.style.borderColor = 'var(--red)';
     }
-}
-
-function formatFecha(txt) {
-    const parts = txt.split('/');
-    if (parts.length === 3) {
-        const meses = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        let d = parts[0].padStart(2, '0');
-        let mIdx = parseInt(parts[1]) - 1;
-        let m = meses[mIdx] || "May";
-        let y = parts[2].length === 2 ? "20" + parts[2] : parts[2];
-        return `${d}-${m} ${y}`;
-    }
-    return txt;
-}
-
-function agregarGasto() {
-    const rawFecha = document.getElementById('addFecha').value;
-    const fecha = rawFecha ? formatFecha(rawFecha) : new Date().toLocaleDateString('es-PE');
-    const tipo = document.getElementById('addTipo').value;
-    const concepto = document.getElementById('addConcepto').value;
-    const detalle = document.getElementById('addDetalle').value;
-    const monto = parseFloat(document.getElementById('addMonto').value);
-    
-    if (!concepto || isNaN(monto)) { alert('Completa concepto y monto correctamente'); return; }
-    
-    DATA.gastos.push({ fecha, tipo, concepto, detalle, monto });
-    renderAll();
-    saveData();
-    
-    document.getElementById('addConcepto').value = '';
-    document.getElementById('addDetalle').value = '';
-    document.getElementById('addMonto').value = '';
-    document.getElementById('addFecha').value = '';
-}
-
-function registrarAporte() {
-    const socio = document.getElementById('aporteSocio').value;
-    const monto = parseFloat(document.getElementById('aporteMonto').value);
-    const fecha = new Date().toLocaleDateString('es-PE', { day:'2-digit', month:'short' });
-    if (!monto) { alert('Ingresa un monto válido'); return; }
-    DATA.aportes.push({ socio, monto, fecha });
-    renderSocioData();
-    saveData();
-    const elAM = document.getElementById('aporteMonto');
-    if(elAM) elAM.value = '';
-}
-
-function eliminarGasto(idx) { 
-    if(confirm('¿Eliminar este gasto?')) { 
-        DATA.gastos.splice(idx, 1); 
-        renderAll(); 
-        saveData(); 
-    } 
-}
-function eliminarAporte(idx) { 
-    if(confirm('¿Eliminar este aporte?')) { 
-        DATA.aportes.splice(idx, 1); 
-        renderSocioData(); 
-        saveData(); 
-    } 
 }
 
 function renderTimeline() {
@@ -301,46 +135,29 @@ function renderTimeline() {
     if (!list) return;
     list.innerHTML = '';
     DATA.gastos.forEach(g => {
-        list.innerHTML += `
-            <div class="tl-item">
-                <div class="tl-date">${g.fecha}</div>
-                <div class="tl-text">${g.concepto} - ${g.detalle} — <span class="tl-amt">S/ ${g.monto.toFixed(2)}</span></div>
-            </div>
-        `;
+        list.innerHTML += `<div class="tl-item"><div class="tl-date">${g.fecha}</div><div class="tl-text">${g.concepto} — <span class="tl-amt">S/ ${g.monto.toFixed(2)}</span></div></div>`;
     });
 }
 
+function agregarGasto() {
+    const fecha = document.getElementById('addFecha').value || new Date().toLocaleDateString();
+    const monto = parseFloat(document.getElementById('addMonto').value);
+    if(isNaN(monto)) return;
+    DATA.gastos.push({ fecha, tipo:'otro', concepto: document.getElementById('addConcepto').value, detalle: document.getElementById('addDetalle').value, monto });
+    saveData(); renderAll();
+}
+
+function registrarAporte() {
+    const monto = parseFloat(document.getElementById('aporteMonto').value);
+    if(isNaN(monto)) return;
+    DATA.aportes.push({ socio: document.getElementById('aporteSocio').value, monto, fecha: '12-May' });
+    saveData(); renderSocioData();
+}
+
+function eliminarGasto(i) { DATA.gastos.splice(i,1); saveData(); renderAll(); }
+
 function renderAll() {
-    renderKPIs();
-    renderExpenses();
-    renderSocioData();
-    renderTimeline();
-    calcularVenta();
+    renderKPIs(); renderExpenses(); renderSocioData(); renderTimeline();
 }
 
-function calcularVenta() {
-    const pv = parseFloat(document.getElementById('precioVenta').value) || 0;
-    const dias = parseInt(document.getElementById('diasExtra').value) || 0;
-    const extras = parseFloat(document.getElementById('gastosExtra').value) || 0;
-    const costoAlim = dias * COSTO_DIARIO;
-    const invTotal = totalInvertido() + costoAlim + extras;
-    const ganancia = pv - invTotal;
-    const roi = (ganancia / invTotal * 100);
-    const box = document.getElementById('resultBox');
-    const val = document.getElementById('resultGanancia');
-    const roiEl = document.getElementById('resultRoi');
-    if (!box) return;
-    if (ganancia >= 0) {
-        box.classList.remove('loss');
-        val.textContent = `S/ ${ganancia.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,",")}`;
-        roiEl.textContent = `ROI: ${roi.toFixed(1)}%`;
-    } else {
-        box.classList.add('loss');
-        val.textContent = `-S/ ${Math.abs(ganancia).toFixed(2)}`;
-        roiEl.textContent = `PÉRDIDA: ${roi.toFixed(1)}%`;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadData();
-});
+document.addEventListener('DOMContentLoaded', loadData);
