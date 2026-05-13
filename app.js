@@ -7,26 +7,7 @@ const CONFIG = {
     token: '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' 
 };
 
-let DATA = {
-    gastos: [
-        { fecha:'06-May 2026', tipo:'compra', concepto:'Compra del Torito', detalle:'Adquisición', monto:4500 },
-        { fecha:'06-May 2026', tipo:'transporte', concepto:'Flete', detalle:'Transporte al corral', monto:90 },
-        { fecha:'06-May 18:16', tipo:'alimentacion', concepto:'Alimento Urgencia', detalle:'Acemita 4kg (S/7.20) + Afrecho 1kg (S/1.70) + Polvillo 1kg (S/1.90)', monto:10.80 },
-        { fecha:'sem 6 - 10/May', tipo:'transporte', concepto:'Transporte', detalle:'Transporte compras, corral, etc', monto:60.00 },
-        { fecha:'07-May 2026', tipo:'compra', concepto:'Compra toritos', detalle:'Compra toritos x 3', monto:3000.00 },
-        { fecha:'07-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'Concentrado - AGROMARCO 60kg', monto:54.00 },
-        { fecha:'08-May 2026', tipo:'otro', concepto:'Agua', detalle:'Agua bebederos - Asociación', monto:7.50 },
-        { fecha:'09-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'Concentrado - AGROMARCO 60kg', monto:54.00 },
-        { fecha:'11-May 2026', tipo:'alimentacion', concepto:'Proyección Alimento', detalle:'Ración diaria (S/35) x 25 días', monto:875.00 },
-        { fecha:'11-May 2026', tipo:'otro', concepto:'Limpieza', detalle:'Limpieza de pozo y corral', monto:30.00 }
-    ],
-    aportes: [
-        { socio:'Socio A', monto:1500, fecha:'12-may' },
-        { socio:'Socio A', monto:3000, fecha:'12-may' },
-        { socio:'Socio A', monto:365.65, fecha:'12-may' },
-        { socio:'Socio B', monto:3000, fecha:'12-may' }
-    ]
-};
+let DATA = { gastos: [], aportes: [] };
 
 async function loadData() {
     try {
@@ -54,7 +35,7 @@ async function saveData() {
         });
         const json = await res.json();
         if (json.content) DATA.sha = json.content.sha;
-    } catch (e) { alert("Error al guardar"); }
+    } catch (e) { console.error(e); }
 }
 
 const COSTO_DIARIO = 17.50;
@@ -101,14 +82,18 @@ function renderSocioData() {
     document.getElementById('socioTotalFondear').textContent = `S/ ${(inv + 1050).toFixed(2)}`;
     document.getElementById('socioAporteCadaUno').textContent = `S/ ${porSocio.toFixed(2)}`;
     
-    // Lista aportes
     const listaA = document.getElementById('socioListaAportes');
     if(listaA) {
         listaA.innerHTML = '';
         let tA=0, tB=0;
-        DATA.aportes.slice().reverse().forEach((a, idx) => {
+        // Invertimos el array para que lo más nuevo salga arriba, pero guardando el index real
+        const aportesConIndex = DATA.aportes.map((a, i) => ({...a, index: i}));
+        aportesConIndex.reverse().forEach((a) => {
             if(a.socio === 'Socio A') tA += a.monto; else tB += a.monto;
-            listaA.innerHTML += `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #222"><span>${a.socio} - ${a.fecha}</span><span>S/ ${a.monto.toFixed(2)}</span></div>`;
+            listaA.innerHTML += `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                <span><strong>${a.socio}</strong> - ${a.fecha}</span>
+                <span>S/ ${a.monto.toFixed(2)} <button onclick="eliminarAporte(${a.index})" style="background:none;border:none;cursor:pointer;margin-left:8px;opacity:0.5">❌</button></span>
+            </div>`;
         });
         document.getElementById('totalAporteA').textContent = `S/ ${tA.toFixed(2)}`;
         document.getElementById('totalAporteB').textContent = `S/ ${tB.toFixed(2)}`;
@@ -120,9 +105,10 @@ function renderSocioData() {
 function updateStatusSocio(id, actual, ideal) {
     const el = document.getElementById(`statusSocio${id}`);
     const card = document.getElementById(`cardSocio${id}`);
+    if(!el || !card) return;
     const diff = actual - ideal;
     if(diff >= -0.01) {
-        el.innerHTML = `<span style="color:var(--green)">✓ OK</span>`;
+        el.innerHTML = `<span style="color:var(--green)">✓ OK (S/ +${diff.toFixed(2)})</span>`;
         card.style.borderColor = 'var(--green)';
     } else {
         el.innerHTML = `<span style="color:var(--red)">⚠ DEBE S/ ${Math.abs(diff).toFixed(2)}</span>`;
@@ -150,11 +136,14 @@ function agregarGasto() {
 function registrarAporte() {
     const monto = parseFloat(document.getElementById('aporteMonto').value);
     if(isNaN(monto)) return;
-    DATA.aportes.push({ socio: document.getElementById('aporteSocio').value, monto, fecha: '12-May' });
+    const fecha = new Date().toLocaleDateString('es-PE', { day:'2-digit', month:'short' });
+    DATA.aportes.push({ socio: document.getElementById('aporteSocio').value, monto, fecha });
     saveData(); renderSocioData();
+    document.getElementById('aporteMonto').value = '';
 }
 
-function eliminarGasto(i) { DATA.gastos.splice(i,1); saveData(); renderAll(); }
+function eliminarGasto(i) { if(confirm('¿Eliminar este gasto?')) { DATA.gastos.splice(i,1); saveData(); renderAll(); } }
+function eliminarAporte(i) { if(confirm('¿Eliminar este aporte?')) { DATA.aportes.splice(i,1); saveData(); renderSocioData(); } }
 
 function renderAll() {
     renderKPIs(); renderExpenses(); renderSocioData(); renderTimeline();
