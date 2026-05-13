@@ -1,5 +1,5 @@
 // ============================================================
-// DATA STORE (Local & Cloud)
+// DATA STORE
 // ============================================================
 const CONFIG = {
     repo: 'CENRRI/ganado-ica',
@@ -7,7 +7,6 @@ const CONFIG = {
     token: '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'
 };
 
-// Datos maestros que siempre deben estar presentes
 let DATA = {
     gastos: [
         { fecha:'06-May 2026', tipo:'compra', concepto:'Compra del Torito', detalle:'Adquisición', monto:4500 },
@@ -33,21 +32,22 @@ let DATA = {
 // PERSISTENCE ENGINE
 // ============================================================
 async function loadData() {
-    renderAll(); // Renderizamos local primero para no mostrar nada vacío
+    renderAll(); 
     try {
         const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/contents/${CONFIG.path}?t=${Date.now()}`, {
             headers: { 'Authorization': `token ${CONFIG.token}` }
         });
-        if (!res.ok) throw new Error("API Error");
-        const json = await res.json();
-        const content = decodeURIComponent(escape(atob(json.content)));
-        const cloudData = JSON.parse(content);
-        if (cloudData.gastos && cloudData.gastos.length > 0) {
-            DATA = cloudData;
-            DATA.sha = json.sha;
-            renderAll(); // Re-renderizamos con lo de la nube
+        if (res.ok) {
+            const json = await res.json();
+            const content = decodeURIComponent(escape(atob(json.content)));
+            const cloudData = JSON.parse(content);
+            if (cloudData.gastos && cloudData.gastos.length > 0) {
+                DATA = cloudData;
+                DATA.sha = json.sha;
+                renderAll();
+            }
         }
-    } catch (e) { console.warn("Modo Local Activo (Nube inaccesible)"); }
+    } catch (e) { console.warn("Usando datos locales."); }
 }
 
 async function saveData() {
@@ -60,24 +60,23 @@ async function saveData() {
         });
         const json = await res.json();
         if (json.content) DATA.sha = json.content.sha;
-    } catch (e) { console.error("Save Error:", e); }
+    } catch (e) { console.error("Save error:", e); }
 }
 
 // ============================================================
-// RENDERERS
+// RENDER FUNCTIONS
 // ============================================================
 function renderAll() {
     const inv = DATA.gastos.reduce((s, g) => s + g.monto, 0);
-    const venta = 11000;
-    const ganancia = venta - inv;
+    const ganancia = 11000 - inv;
 
     // Resumen KPIs
-    setTxt('kpiGanancia', `S/ ${ganancia.toFixed(0)}`);
-    setTxt('kpiRoi', `${(ganancia/inv*100).toFixed(1)}%`);
-    setTxt('kpiInversion', `S/ ${inv.toFixed(2)}`);
-    setTxt('kpiDias', Math.max(1, Math.ceil((new Date() - new Date('2026-05-06')) / 864e5)));
+    const kGan = document.getElementById('kpiGanancia'); if(kGan) kGan.textContent = `S/ ${ganancia.toFixed(0)}`;
+    const kRoi = document.getElementById('kpiRoi'); if(kRoi) kRoi.textContent = `${(ganancia/inv*100).toFixed(1)}%`;
+    const kInv = document.getElementById('kpiInversion'); if(kInv) kInv.textContent = `S/ ${inv.toFixed(2)}`;
+    const kDia = document.getElementById('kpiDias'); if(kDia) kDia.textContent = Math.max(1, Math.ceil((new Date() - new Date('2026-05-06')) / 864e5));
 
-    // Gastos Table
+    // Tabla Gastos
     const tbody = document.getElementById('expensesBody');
     if (tbody) {
         tbody.innerHTML = DATA.gastos.map((g, i) => `<tr>
@@ -86,33 +85,33 @@ function renderAll() {
             <td>${g.detalle}</td>
             <td class="amt">S/ ${g.monto.toFixed(2)} <button onclick="eliminarGasto(${i})" style="opacity:0.3;border:none;background:none;cursor:pointer">🗑️</button></td>
         </tr>`).join('');
-        setTxt('totalInvertido', `S/ ${inv.toFixed(2)}`);
+        const tInv = document.getElementById('totalInvertido'); if(tInv) tInv.textContent = `S/ ${inv.toFixed(2)}`;
     }
 
     // Socio Data
     const ideal = (inv + 1050) / 2;
-    setTxt('socioInversion', `S/ ${inv.toFixed(2)}`);
-    setTxt('socioUtilidad', `S/ ${ganancia.toFixed(2)}`);
-    setTxt('socioPagoCadaUno', `S/ ${(ganancia/2).toFixed(2)}`);
-    setTxt('socioInvEjecutada', `S/ ${inv.toFixed(2)}`);
-    setTxt('socioTotalFondear', `S/ ${(inv+1050).toFixed(2)}`);
-    setTxt('socioAporteCadaUno', `S/ ${ideal.toFixed(2)}`);
+    const sInv = document.getElementById('socioInversion'); if(sInv) sInv.textContent = `S/ ${inv.toFixed(2)}`;
+    const sUti = document.getElementById('socioUtilidad'); if(sUti) sUti.textContent = `S/ ${ganancia.toFixed(2)}`;
+    const sPag = document.getElementById('socioPagoCadaUno'); if(sPag) sPag.textContent = `S/ ${(ganancia/2).toFixed(2)}`;
+    const sIEj = document.getElementById('socioInvEjecutada'); if(sIEj) sIEj.textContent = `S/ ${inv.toFixed(2)}`;
+    const sTFo = document.getElementById('socioTotalFondear'); if(sTFo) sTFo.textContent = `S/ ${(inv+1050).toFixed(2)}`;
+    const sACa = document.getElementById('socioAporteCadaUno'); if(sACa) sACa.textContent = `S/ ${ideal.toFixed(2)}`;
 
     // Historial Gastos (Socio)
-    const hGastos = document.getElementById('socioListaGastos');
-    if (hGastos) hGastos.innerHTML = DATA.gastos.slice().reverse().map(g => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #222"><span>${g.fecha} - ${g.concepto}</span><span>S/ ${g.monto.toFixed(2)}</span></div>`).join('');
+    const hG = document.getElementById('socioListaGastos');
+    if (hG) hG.innerHTML = DATA.gastos.slice().reverse().map(g => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #222"><span>${g.fecha} - ${g.concepto}</span><span>S/ ${g.monto.toFixed(2)}</span></div>`).join('');
 
     // Historial Aportes
-    const hAportes = document.getElementById('socioListaAportes');
-    if (hAportes) {
+    const hA = document.getElementById('socioListaAportes');
+    if (hA) {
         let tA=0, tB=0;
-        hAportes.innerHTML = DATA.aportes.slice().reverse().map((a, i) => {
-            const realIdx = DATA.aportes.length - 1 - i;
+        hA.innerHTML = DATA.aportes.slice().reverse().map((a, i) => {
+            const rIdx = DATA.aportes.length - 1 - i;
             if (a.socio === 'Socio A') tA += a.monto; else tB += a.monto;
-            return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #222"><span>${a.socio} - ${a.fecha}</span><span>S/ ${a.monto.toFixed(2)} <button onclick="eliminarAporte(${realIdx})" style="opacity:0.5;border:none;background:none;cursor:pointer">❌</button></span></div>`;
+            return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #222"><span>${a.socio} - ${a.fecha}</span><span>S/ ${a.monto.toFixed(2)} <button onclick="eliminarAporte(${rIdx})" style="opacity:0.5;border:none;background:none;cursor:pointer">❌</button></span></div>`;
         }).join('');
-        setTxt('totalAporteA', `S/ ${tA.toFixed(2)}`);
-        setTxt('totalAporteB', `S/ ${tB.toFixed(2)}`);
+        const totA = document.getElementById('totalAporteA'); if(totA) totA.textContent = `S/ ${tA.toFixed(2)}`;
+        const totB = document.getElementById('totalAporteB'); if(totB) totB.textContent = `S/ ${tB.toFixed(2)}`;
         updateStatusSocio('A', tA, ideal);
         updateStatusSocio('B', tB, ideal);
     }
@@ -124,14 +123,14 @@ function renderAll() {
     // Categorias
     const cats = {compra:0, transporte:0, alimentacion:0, medicina:0, otro:0};
     DATA.gastos.forEach(g => { if(cats[g.tipo]!==undefined) cats[g.tipo]+=g.monto; });
-    setTxt('catCompra', `S/ ${cats.compra.toFixed(2)}`);
-    setTxt('catTransporte', `S/ ${cats.transporte.toFixed(2)}`);
-    setTxt('catAlimentacion', `S/ ${cats.alimentacion.toFixed(2)}`);
-    setTxt('catMedicina', `S/ ${cats.medicina.toFixed(2)}`);
-    setTxt('catOtro', `S/ ${cats.otro.toFixed(2)}`);
-}
+    const cComp = document.getElementById('catCompra'); if(cComp) cComp.textContent = `S/ ${cats.compra.toFixed(2)}`;
+    const cTran = document.getElementById('catTransporte'); if(cTran) cTran.textContent = `S/ ${cats.transporte.toFixed(2)}`;
+    const cAlim = document.getElementById('catAlimentacion'); if(cAlim) cAlim.textContent = `S/ ${cats.alimentacion.toFixed(2)}`;
+    const cMedi = document.getElementById('catMedicina'); if(cMedi) cMedi.textContent = `S/ ${cats.medicina.toFixed(2)}`;
+    const cOtro = document.getElementById('catOtro'); if(cOtro) cOtro.textContent = `S/ ${cats.otro.toFixed(2)}`;
 
-function setTxt(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+    calcularVenta();
+}
 
 function updateStatusSocio(id, act, idl) {
     const el = document.getElementById(`statusSocio${id}`);
@@ -142,9 +141,23 @@ function updateStatusSocio(id, act, idl) {
     else { el.innerHTML = `<span style="color:#ef4444">⚠ DEBE S/ ${Math.abs(diff).toFixed(2)}</span>`; card.style.borderColor = '#ef4444'; }
 }
 
-// ============================================================
-// ACTIONS
-// ============================================================
+function calcularVenta() {
+    const pv = parseFloat(document.getElementById('precioVenta').value) || 0;
+    const dias = parseInt(document.getElementById('diasExtra').value) || 0;
+    const extras = parseFloat(document.getElementById('gastosExtra').value) || 0;
+    const invTotal = totalInvertido() + (dias * 17.5) + extras;
+    const ganancia = pv - invTotal;
+    const box = document.getElementById('resultBox');
+    const val = document.getElementById('resultGanancia');
+    const roiEl = document.getElementById('resultRoi');
+    if (!box) return;
+    val.textContent = `S/ ${ganancia.toFixed(2)}`;
+    roiEl.textContent = `ROI: ${(ganancia/invTotal*100).toFixed(1)}%`;
+    if (ganancia >= 0) box.classList.remove('loss'); else box.classList.add('loss');
+}
+
+function totalInvertido() { return DATA.gastos.reduce((s, g) => s + g.monto, 0); }
+
 function agregarGasto() {
     const monto = parseFloat(document.getElementById('addMonto').value);
     if (isNaN(monto)) return;
