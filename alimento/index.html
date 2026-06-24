@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Receta Final — Proyecto RES</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh;padding:24px}
+.container{max-width:1100px;margin:0 auto}
+h1{font-size:1.8rem;font-weight:800;text-align:center;margin-bottom:6px;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{text-align:center;color:#94a3b8;font-size:.85rem;margin-bottom:8px}
+.no-conc{text-align:center;margin-bottom:28px}
+.no-conc span{background:rgba(239,68,68,.15);color:#f87171;padding:4px 14px;border-radius:20px;font-size:.75rem;font-weight:600}
+.section-title{font-size:1.1rem;font-weight:700;margin:32px 0 16px;padding-left:12px;border-left:3px solid #f59e0b;color:#fbbf24}
+.card{background:#1a1d2e;border-radius:16px;padding:24px;margin-bottom:24px;border:1px solid #2a2d3e;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.card.grande::before{background:linear-gradient(90deg,#f59e0b,#ef4444)}
+.card.peque::before{background:linear-gradient(90deg,#22d3ee,#6366f1)}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.card-header .icon{font-size:2rem}
+.card-header h2{font-size:1.2rem;font-weight:700}
+.card-header h2 span{font-size:.75rem;font-weight:500;color:#94a3b8;display:block;margin-top:2px}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:600}
+.badge.engorde{background:rgba(245,158,11,.15);color:#fbbf24}
+.badge.crece{background:rgba(34,211,238,.15);color:#22d3ee}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tag{background:#252840;padding:4px 10px;border-radius:8px;font-size:.72rem;color:#cbd5e1}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.82rem}
+th{background:#252840;color:#94a3b8;font-weight:600;text-align:left;padding:10px 12px;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px}
+td{padding:10px 12px;border-bottom:1px solid #252840}
+tr:last-child td{border-bottom:none}
+tr.total-row td{font-weight:700;color:#fbbf24;border-top:2px solid #f59e0b;background:rgba(245,158,11,.05)}
+tr.sub-row td{font-weight:600;color:#94a3b8;border-top:1px dashed #3a3d4e}
+.func{font-size:.7rem;padding:2px 8px;border-radius:10px;display:inline-block}
+.func.energy{color:#f59e0b;background:rgba(245,158,11,.1)}
+.func.protein{color:#22d3ee;background:rgba(34,211,238,.1)}
+.func.fiber{color:#4ade80;background:rgba(74,222,128,.1)}
+.horario{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px}
+.horario-item{background:#252840;border-radius:10px;padding:12px;text-align:center}
+.horario-item .time{font-size:1.1rem;font-weight:700;color:#fbbf24}
+.horario-item p{font-size:.75rem;color:#94a3b8;margin-top:4px}
+.cost-box{display:inline-block;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(239,68,68,.1));border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:8px 16px;margin-top:8px;font-size:.85rem;font-weight:600;color:#fbbf24}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:16px 0}
+.summary-card{background:#1a1d2e;border-radius:12px;padding:16px;border:1px solid #2a2d3e;text-align:center}
+.summary-card .val{font-size:1.6rem;font-weight:800;margin:4px 0}
+.summary-card .val.save{background:linear-gradient(135deg,#4ade80,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.summary-card .label{font-size:.72rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:12px;overflow:hidden;margin:16px 0}
+.compare .old,.compare .new{padding:16px;text-align:center}
+.compare .old{background:#1e1215;border:1px solid #3b1a1a}
+.compare .new{background:#0f2118;border:1px solid #1a3b2a}
+.compare .val{font-size:1.4rem;font-weight:800}
+.compare .old .val{color:#ef4444}
+.compare .new .val{color:#4ade80}
+.compare .label{font-size:.7rem;color:#94a3b8;margin-bottom:4px}
+.note{background:#252840;border-radius:10px;padding:12px 16px;margin:8px 0;font-size:.78rem;color:#94a3b8;border-left:3px solid #6366f1}
+.note b{color:#e2e8f0}
+.prices-table tr:nth-child(even){background:#1f2237}
+.prices-table .best{color:#4ade80;font-weight:700}
+@media(max-width:600px){body{padding:12px}h1{font-size:1.3rem}.card{padding:16px}table{font-size:.75rem}th,td{padding:8px 6px}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🐂 Receta Final de Alimentación</h1>
+<p class="subtitle">Proyecto RES — 14 Mayo 2026 · 1 Torito Grande + 3 Toritos Pequeños</p>
+<div class="no-conc"><span>⛔ SIN CONCENTRADO COMERCIAL — Solo insumos sueltos</span></div>
+
+<!-- PRECIOS -->
+<div class="section-title">💰 Precios Reales (ALMAFAR)</div>
+<div class="card">
+<table class="prices-table">
+<tr><th>Insumo</th><th>ALMAFAR</th><th>Urgencia</th><th>Precio Final</th><th>Tipo</th></tr>
+<tr><td>Chala (forraje)</td><td>0.45</td><td>—</td><td class="best">S/ 0.45</td><td><span class="func fiber">Fibra</span></td></tr>
+<tr><td>Coronta molida</td><td>0.60</td><td>—</td><td class="best">S/ 0.60</td><td><span class="func fiber">Fibra</span></td></tr>
+<tr><td>Polvillo de arroz</td><td>0.60</td><td>1.90</td><td class="best">S/ 0.60</td><td><span class="func energy">Energía</span></td></tr>
+<tr><td>Afrecho</td><td>1.20</td><td>1.70</td><td class="best">S/ 1.20</td><td><span class="func protein">Prot/Fibra</span></td></tr>
+<tr><td>Cemita (Acemita)</td><td>1.26</td><td>1.80</td><td class="best">S/ 1.26</td><td><span class="func energy">Energía</span></td></tr>
+<tr><td>Maíz molido</td><td>1.42</td><td>—</td><td class="best">S/ 1.42</td><td><span class="func energy">Energía+</span></td></tr>
+<tr><td>Soya</td><td>1.84</td><td>—</td><td class="best">S/ 1.84</td><td><span class="func protein">Proteína+</span></td></tr>
+</table>
+</div>
+
+<!-- TORITO GRANDE -->
+<div class="section-title">🥩 Recetas Optimizadas</div>
+<div class="card grande">
+<div class="card-header">
+<div class="icon">🐂</div>
+<h2>TORITO GRANDE <span>Dieta de Engorde / Acabado</span></h2>
+<span class="badge engorde">ENGORDE</span>
+</div>
+<div class="tags">
+<span class="tag">Holstein Rojo × Criollo</span>
+<span class="tag">~300 kg</span>
+<span class="tag">14-20 meses</span>
+<span class="tag">CC: 2.5-3.0</span>
+</div>
+<table>
+<tr><th>Insumo</th><th>Kg/día</th><th>S//kg</th><th>Costo/día</th><th>Función</th></tr>
+<tr><td>Maíz molido</td><td>2.5</td><td>1.42</td><td>S/ 3.55</td><td><span class="func energy">Energía → grasa</span></td></tr>
+<tr><td>Polvillo de arroz</td><td>2.5</td><td>0.60</td><td>S/ 1.50</td><td><span class="func energy">Energía + aceite</span></td></tr>
+<tr><td>Afrecho</td><td>1.5</td><td>1.20</td><td>S/ 1.80</td><td><span class="func protein">Fibra + proteína</span></td></tr>
+<tr><td>Soya</td><td>1.0</td><td>1.84</td><td>S/ 1.84</td><td><span class="func protein">Músculo</span></td></tr>
+<tr><td>Cemita</td><td>0.5</td><td>1.26</td><td>S/ 0.63</td><td><span class="func energy">Energía comp.</span></td></tr>
+<tr class="sub-row"><td><b>Subtotal mezcla</b></td><td><b>8.0</b></td><td></td><td><b>S/ 9.32</b></td><td></td></tr>
+<tr><td>Chala (forraje)</td><td>7.0</td><td>0.45</td><td>S/ 3.15</td><td><span class="func fiber">Fibra/rumen</span></td></tr>
+<tr class="total-row"><td>TOTAL DIARIO</td><td>15.0 kg</td><td></td><td>S/ 12.47</td><td></td></tr>
+</table>
+<div class="cost-box">📅 Costo mensual: S/ 374.10</div>
+<div class="horario">
+<div class="horario-item"><div class="time">🌅 6:00 AM</div><p>4 kg mezcla + 3.5 kg chala</p></div>
+<div class="horario-item"><div class="time">🌆 4:00 PM</div><p>4 kg mezcla + 3.5 kg chala</p></div>
+<div class="horario-item"><div class="time">💧 24/7</div><p>Agua limpia siempre</p></div>
+</div>
+</div>
+
+<!-- TORITOS PEQUEÑOS -->
+<div class="card peque">
+<div class="card-header">
+<div class="icon">🐄🐄🐄</div>
+<h2>TORITOS PEQUEÑOS ×3 <span>Dieta de Crecimiento</span></h2>
+<span class="badge crece">CRECIMIENTO</span>
+</div>
+<div class="tags">
+<span class="tag">~8-12 meses</span>
+<span class="tag">~120-180 kg</span>
+<span class="tag">En desarrollo</span>
+</div>
+<table>
+<tr><th>Insumo</th><th>Kg/día (c/u)</th><th>Kg/día (×3)</th><th>S//kg</th><th>Costo/día (×3)</th><th>Función</th></tr>
+<tr><td>Afrecho</td><td>1.75</td><td>5.25</td><td>1.20</td><td>S/ 6.30</td><td><span class="func protein">Prot + fibra</span></td></tr>
+<tr><td>Soya</td><td>0.75</td><td>2.25</td><td>1.84</td><td>S/ 4.14</td><td><span class="func protein">Huesos/músculo</span></td></tr>
+<tr><td>Polvillo de arroz</td><td>0.75</td><td>2.25</td><td>0.60</td><td>S/ 1.35</td><td><span class="func energy">Energía suave</span></td></tr>
+<tr><td>Cemita</td><td>0.75</td><td>2.25</td><td>1.26</td><td>S/ 2.84</td><td><span class="func energy">Energía comp.</span></td></tr>
+<tr><td>Maíz molido</td><td>0.50</td><td>1.50</td><td>1.42</td><td>S/ 2.13</td><td><span class="func energy">Energía extra</span></td></tr>
+<tr class="sub-row"><td><b>Subtotal mezcla</b></td><td><b>4.5</b></td><td><b>13.5</b></td><td></td><td><b>S/ 16.76</b></td><td></td></tr>
+<tr><td>Chala (forraje)</td><td>4.5</td><td>13.5</td><td>0.45</td><td>S/ 6.08</td><td><span class="func fiber">Fibra/rumen</span></td></tr>
+<tr><td>Coronta molida</td><td>0.5</td><td>1.5</td><td>0.60</td><td>S/ 0.90</td><td><span class="func fiber">Fibra extra</span></td></tr>
+<tr class="total-row"><td>TOTAL DIARIO (×3)</td><td>9.5 kg</td><td>28.5 kg</td><td></td><td>S/ 23.74</td><td></td></tr>
+</table>
+<div class="cost-box">📅 Mensual (×3): S/ 712.20 · S/ 237.40 c/u</div>
+<div class="horario">
+<div class="horario-item"><div class="time">🌅 6:00 AM</div><p>2.25 kg mezcla + 2.5 kg chala</p></div>
+<div class="horario-item"><div class="time">🌆 4:00 PM</div><p>2.25 kg mezcla + 2.5 kg chala</p></div>
+<div class="horario-item"><div class="time">💧 24/7</div><p>Agua limpia siempre</p></div>
+</div>
+</div>
+
+<!-- COMPARATIVA -->
+<div class="section-title">📊 Comparativa: Cuaderno vs Receta Final</div>
+<div class="compare">
+<div class="old"><div class="label">OPCIÓN #03 (Cuaderno)</div><div class="val">S/ 46.72/día</div><p style="font-size:.7rem;color:#94a3b8;margin-top:4px">S/ 1,401.60/mes</p></div>
+<div class="new"><div class="label">🏆 RECETA FINAL</div><div class="val">S/ 36.21/día</div><p style="font-size:.7rem;color:#94a3b8;margin-top:4px">S/ 1,086.30/mes</p></div>
+</div>
+<div class="summary-grid">
+<div class="summary-card"><div class="label">Ahorro Mensual</div><div class="val save">S/ 315.30</div><div class="label">-22% vs cuaderno</div></div>
+<div class="summary-card"><div class="label">Torito Grande</div><div class="val" style="color:#fbbf24">S/ 12.47</div><div class="label">por día</div></div>
+<div class="summary-card"><div class="label">Cada Pequeño</div><div class="val" style="color:#22d3ee">S/ 7.91</div><div class="label">por día</div></div>
+<div class="summary-card"><div class="label">Compra Quincenal</div><div class="val" style="color:#a78bfa">S/ 543</div><div class="label">652.5 kg totales</div></div>
+</div>
+
+<!-- COMPRAS MENSUALES DESGLOSADAS -->
+<div class="section-title">🛒 Compra Mensual de Insumos (30 días)</div>
+
+<!-- Torito Grande -->
+<div class="card grande">
+<div class="card-header">
+<div class="icon">🐂</div>
+<h2>Compra Mensual — Torito Grande</h2>
+</div>
+<table>
+<tr><th>Insumo</th><th>Kg/día</th><th>Kg/mes</th><th>S//kg</th><th>Costo/mes</th></tr>
+<tr><td>Maíz molido</td><td>2.5</td><td>75</td><td>1.42</td><td>S/ 106.50</td></tr>
+<tr><td>Polvillo de arroz</td><td>2.5</td><td>75</td><td>0.60</td><td>S/ 45.00</td></tr>
+<tr><td>Afrecho</td><td>1.5</td><td>45</td><td>1.20</td><td>S/ 54.00</td></tr>
+<tr><td>Soya</td><td>1.0</td><td>30</td><td>1.84</td><td>S/ 55.20</td></tr>
+<tr><td>Cemita</td><td>0.5</td><td>15</td><td>1.26</td><td>S/ 18.90</td></tr>
+<tr><td>Chala (forraje)</td><td>7.0</td><td>210</td><td>0.45</td><td>S/ 94.50</td></tr>
+<tr class="total-row"><td>TOTAL</td><td>15.0</td><td>450 kg</td><td></td><td>S/ 374.10</td></tr>
+</table>
+</div>
+
+<!-- 3 Toritos Pequeños -->
+<div class="card peque">
+<div class="card-header">
+<div class="icon">🐄🐄🐄</div>
+<h2>Compra Mensual — 3 Toritos Pequeños</h2>
+</div>
+<table>
+<tr><th>Insumo</th><th>Kg/día (×3)</th><th>Kg/mes</th><th>S//kg</th><th>Costo/mes</th></tr>
+<tr><td>Afrecho</td><td>5.25</td><td>157.5</td><td>1.20</td><td>S/ 189.00</td></tr>
+<tr><td>Soya</td><td>2.25</td><td>67.5</td><td>1.84</td><td>S/ 124.20</td></tr>
+<tr><td>Polvillo de arroz</td><td>2.25</td><td>67.5</td><td>0.60</td><td>S/ 40.50</td></tr>
+<tr><td>Cemita</td><td>2.25</td><td>67.5</td><td>1.26</td><td>S/ 85.05</td></tr>
+<tr><td>Maíz molido</td><td>1.50</td><td>45</td><td>1.42</td><td>S/ 63.90</td></tr>
+<tr><td>Chala (forraje)</td><td>13.5</td><td>405</td><td>0.45</td><td>S/ 182.25</td></tr>
+<tr><td>Coronta molida</td><td>1.5</td><td>45</td><td>0.60</td><td>S/ 27.00</td></tr>
+<tr class="total-row"><td>TOTAL</td><td>28.5</td><td>855 kg</td><td></td><td>S/ 711.90</td></tr>
+</table>
+</div>
+
+<!-- TOTAL CONSOLIDADO -->
+<div class="card" style="border-color:#f59e0b33">
+<div class="card-header">
+<div class="icon">📦</div>
+<h2>Compra Total Mensual — 4 Animales <span>Lista de compras consolidada para ALMAFAR</span></h2>
+</div>
+<table>
+<tr><th>Insumo</th><th>Torito Grande</th><th>3 Pequeños</th><th>Total Kg</th><th>Total S/</th></tr>
+<tr><td>Afrecho</td><td>45 kg</td><td>157.5 kg</td><td>202.5 kg</td><td>S/ 243.00</td></tr>
+<tr><td>Maíz molido</td><td>75 kg</td><td>45 kg</td><td>120 kg</td><td>S/ 170.40</td></tr>
+<tr><td>Soya</td><td>30 kg</td><td>67.5 kg</td><td>97.5 kg</td><td>S/ 179.40</td></tr>
+<tr><td>Polvillo de arroz</td><td>75 kg</td><td>67.5 kg</td><td>142.5 kg</td><td>S/ 85.50</td></tr>
+<tr><td>Cemita</td><td>15 kg</td><td>67.5 kg</td><td>82.5 kg</td><td>S/ 103.95</td></tr>
+<tr><td>Chala</td><td>210 kg</td><td>405 kg</td><td>615 kg</td><td>S/ 276.75</td></tr>
+<tr><td>Coronta molida</td><td>—</td><td>45 kg</td><td>45 kg</td><td>S/ 27.00</td></tr>
+<tr class="total-row"><td>GRAN TOTAL</td><td>450 kg</td><td>855 kg</td><td>1,305 kg</td><td>S/ 1,086.00</td></tr>
+</table>
+</div>
+
+<!-- NOTAS -->
+<div class="section-title">⚠️ Notas Importantes</div>
+<div class="note"><b>Sal mineral:</b> Agregar bloque en el corral (~S/ 8-12, dura ~1 mes). Esencial para los pequeños.</div>
+<div class="note"><b>Agua:</b> Verificar bebederos 2x/día. Sin agua el consumo cae 30-40%.</div>
+<div class="note"><b>Transición:</b> Cambiar gradualmente en 3-4 días (mezclar 50/50).</div>
+<div class="note"><b>Monitoreo:</b> Heces sueltas → reducir maíz/polvillo. Heces duras → más chala.</div>
+<div class="note" style="border-left-color:#ef4444"><b>⛔ Separar raciones:</b> NO dar la misma ración a todos. El grande come 60% más que cada pequeño.</div>
+
+<p style="text-align:center;color:#475569;font-size:.7rem;margin:32px 0 16px">Fuente: Cotización ALMAFAR (receta01/receta02) · Sin concentrado comercial</p>
+</div>
+</body>
+</html>

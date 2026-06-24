@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operación Torito 01</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">TORITO 01</div>
+    <div class="sidebar-status"><div class="dot"></div>OPERACIÓN ACTIVA</div>
+    <div class="nav-section">Panel</div>
+    <div class="nav-item active" data-page="resumen" onclick="showPage('resumen')"><span class="nav-icon">📊</span>Resumen</div>
+    <div class="nav-item" data-page="animal" onclick="showPage('animal')"><span class="nav-icon">🐂</span>Ficha Animal</div>
+    <div class="nav-item" data-page="dieta" onclick="showPage('dieta')"><span class="nav-icon">🌾</span>Dieta Diaria</div>
+    <div class="nav-section">Finanzas</div>
+    <div class="nav-item" data-page="gastos" onclick="showPage('gastos')"><span class="nav-icon">💰</span>Gastos</div>
+    <div class="nav-item" data-page="venta" onclick="showPage('venta')"><span class="nav-icon">🏷️</span>Simulador Venta</div>
+    <div class="nav-section">Operación</div>
+    <div class="nav-item" data-page="alertas" onclick="showPage('alertas')"><span class="nav-icon">🚨</span>Alertas</div>
+    <div class="nav-item" data-page="bitacora" onclick="showPage('bitacora')"><span class="nav-icon">📋</span>Bitácora</div>
+</div>
+
+<div class="main">
+
+<!-- ===== RESUMEN ===== -->
+<div id="resumen" class="page active">
+    <div class="page-title">Resumen General</div>
+    <div class="grid-4">
+        <div class="kpi g"><div class="kpi-label">Ganancia Proyectada</div><div class="kpi-value" id="kpiGanancia">S/ 1,699</div><div class="kpi-sub">Venta a S/ 6,300</div></div>
+        <div class="kpi b"><div class="kpi-label">ROI</div><div class="kpi-value" id="kpiRoi">36.9%</div><div class="kpi-sub">Retorno inversión</div></div>
+        <div class="kpi a"><div class="kpi-label">Días en Corral</div><div class="kpi-value" id="kpiDias">1</div><div class="kpi-sub">Meta: ≤ 14 días</div></div>
+        <div class="kpi r"><div class="kpi-label">Total Invertido</div><div class="kpi-value" id="kpiInversion">S/ 4,600.80</div><div class="kpi-sub">Gasto diario: S/ 17.50</div></div>
+    </div>
+    <div class="grid-2" style="margin-top:16px">
+        <div class="card">
+            <div class="card-title">Alerta Principal</div>
+            <div class="alert urg"><div class="alert-icon">🔴</div><div><div class="alert-tag">!! URGENCIA !!</div><strong>Contactar comprador HOY.</strong> Cada día sin vender cuesta S/ 17.50. Contraoferta: S/ 6,500.</div></div>
+        </div>
+        <div class="card">
+            <div class="card-title">Próxima Alimentación</div>
+            <div style="font-size:13px;color:var(--text2)">
+                <p><strong style="color:var(--amber)">Mañana 07-May — 2 tomas:</strong></p>
+                <p style="margin-top:8px">🌅 <strong>6:00 AM:</strong> Maíz 1kg + Pasta 1kg + Soya 0.5kg + Afrecho 1kg + Coronta 0.5kg + Chala 2kg = <strong>6 kg</strong></p>
+                <p style="margin-top:4px">🌇 <strong>4:00 PM:</strong> Maíz 1kg + Pasta 1kg + Soya 0.5kg + Afrecho 1kg + Coronta 0.5kg + Chala 2kg = <strong>6 kg</strong></p>
+                <p style="margin-top:8px;color:var(--muted)">Total diario: 12 kg | Costo: S/ 17.50</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FICHA ANIMAL ===== -->
+<div id="animal" class="page">
+    <div class="page-title">Ficha del Animal</div>
+    <div class="animal-grid">
+        <div><img src="frame_q1.jpg" class="animal-photo"><img src="frame_mid.jpg" class="animal-photo" style="margin-top:12px"></div>
+        <div>
+            <div class="card">
+                <div class="card-title">Características</div>
+                <div class="spec-grid">
+                    <div class="spec"><div class="spec-label">Raza</div><div class="spec-value">Holstein Rojo × Criollo</div></div>
+                    <div class="spec"><div class="spec-label">Sexo</div><div class="spec-value">Macho (Torete)</div></div>
+                    <div class="spec"><div class="spec-label">Edad</div><div class="spec-value">14-20 meses</div></div>
+                    <div class="spec"><div class="spec-label">Peso Estimado</div><div class="spec-value">280-320 kg</div></div>
+                    <div class="spec"><div class="spec-label">Condición Corporal</div><div class="spec-value">2.5 - 3.0 / 5</div></div>
+                    <div class="spec"><div class="spec-label">Temperamento</div><div class="spec-value">Dócil</div></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Observaciones</div>
+                <ul style="font-size:13px;color:var(--text2);padding-left:16px;line-height:2">
+                    <li>Pelaje marrón rojizo (colorado) con manchas blancas irregulares</li>
+                    <li>Costillas ligeramente visibles — margen de engorde</li>
+                    <li>Sin signos de enfermedad al ingreso</li>
+                    <li>Segundo bovino negro presente en el corral</li>
+                    <li>Corral rústico: pallets de madera, muro concreto, tanque IBC 1000L</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DIETA ===== -->
+<div id="dieta" class="page">
+    <div class="page-title">Plan de Alimentación Diaria</div>
+    <div class="card">
+        <div class="card-title">Dieta Optimizada A — 12 kg/día (2 tomas)</div>
+        <div class="feed-schedule">
+            <div class="feed-time">
+                <div class="feed-time-label">🌅 MAÑANA — 6:00 AM (6 kg)</div>
+                <div class="feed-item"><span>Maíz Molido (Polvillo)</span><span class="feed-kg">1.0 kg</span></div>
+                <div class="feed-item"><span>Pasta (Concentrado)</span><span class="feed-kg">1.0 kg</span></div>
+                <div class="feed-item"><span>Soya</span><span class="feed-kg">0.5 kg</span></div>
+                <div class="feed-item"><span>Afrecho</span><span class="feed-kg">1.0 kg</span></div>
+                <div class="feed-item"><span>Coronta Molida</span><span class="feed-kg">0.5 kg</span></div>
+                <div class="feed-item"><span>Chala (Forraje)</span><span class="feed-kg">2.0 kg</span></div>
+            </div>
+            <div class="feed-time">
+                <div class="feed-time-label">🌇 TARDE — 4:00 PM (6 kg)</div>
+                <div class="feed-item"><span>Maíz Molido (Polvillo)</span><span class="feed-kg">1.0 kg</span></div>
+                <div class="feed-item"><span>Pasta (Concentrado)</span><span class="feed-kg">1.0 kg</span></div>
+                <div class="feed-item"><span>Soya</span><span class="feed-kg">0.5 kg</span></div>
+                <div class="feed-item"><span>Afrecho</span><span class="feed-kg">1.0 kg</span></div>
+                <div class="feed-item"><span>Coronta Molida</span><span class="feed-kg">0.5 kg</span></div>
+                <div class="feed-item"><span>Chala (Forraje)</span><span class="feed-kg">2.0 kg</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title">Composición Nutricional</div>
+            <table>
+                <tr><th>Insumo</th><th>Kg/día</th><th>Precio/kg</th><th style="text-align:right">Costo/día</th></tr>
+                <tr><td>Maíz Molido</td><td>2.0</td><td>S/ 1.90</td><td class="amt">S/ 3.80</td></tr>
+                <tr><td>Pasta (Concentrado)</td><td>2.0</td><td>S/ 2.20*</td><td class="amt">S/ 4.40</td></tr>
+                <tr><td>Soya</td><td>1.0</td><td>S/ 3.50*</td><td class="amt">S/ 3.50</td></tr>
+                <tr><td>Afrecho</td><td>2.0</td><td>S/ 1.70</td><td class="amt">S/ 3.40</td></tr>
+                <tr><td>Coronta Molida</td><td>1.0</td><td>S/ 0.80*</td><td class="amt">S/ 0.80</td></tr>
+                <tr><td>Chala (Forraje)</td><td>4.0</td><td>S/ 0.40*</td><td class="amt">S/ 1.60</td></tr>
+                <tr class="tfoot-row"><td colspan="3" class="total" style="text-align:right"><strong>TOTAL DIARIO</strong></td><td class="amt total" style="color:var(--text)"><strong>S/ 17.50</strong></td></tr>
+            </table>
+            <p style="font-size:11px;color:var(--muted);margin-top:10px">(*) Precios estimados — confirmar con proveedor</p>
+        </div>
+        <div class="card">
+            <div class="card-title">Notas Importantes</div>
+            <div class="alert warn"><div class="alert-icon">🟡</div><div><div class="alert-tag">ALERTA</div><strong>La Soya (1 kg/día) NO se recorta.</strong> Es el único insumo que genera músculo. Sin ella el animal solo se "infla" con fibra.</div></div>
+            <div class="alert info"><div class="alert-icon">🔵</div><div><div class="alert-tag">INFO</div><strong>Agua fresca disponible 24/7.</strong> Un torete de 300 kg necesita 30-40 litros de agua al día. Verificar tanque IBC.</div></div>
+            <div class="alert ok"><div class="alert-icon">🟢</div><div><div class="alert-tag">AHORRO</div>Esta dieta ahorra <strong>S/ 96/mes</strong> vs. la receta original de 15 kg/día, manteniendo la misma calidad nutricional.</div></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== GASTOS ===== -->
+<div id="gastos" class="page">
+    <div class="page-title">Control de Gastos</div>
+    <div class="card">
+        <div class="card-title">Gastos por Categoría</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+            <div class="kpi r"><div class="kpi-label">Compra</div><div class="kpi-value" id="catCompra" style="font-size:18px">S/ 4,500</div></div>
+            <div class="kpi a"><div class="kpi-label">Transporte</div><div class="kpi-value" id="catTransporte" style="font-size:18px">S/ 90</div></div>
+            <div class="kpi b"><div class="kpi-label">Alimentación</div><div class="kpi-value" id="catAlimentacion" style="font-size:18px">S/ 10.80</div></div>
+            <div class="kpi g"><div class="kpi-label">Medicinas</div><div class="kpi-value" id="catMedicina" style="font-size:18px">S/ 0</div></div>
+            <div class="kpi a"><div class="kpi-label">Otros</div><div class="kpi-value" id="catOtro" style="font-size:18px">S/ 0</div></div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title">Detalle de Gastos</div>
+        <table>
+            <thead><tr><th>Fecha</th><th>Concepto</th><th>Detalle</th><th style="text-align:right">Monto</th><th></th></tr></thead>
+            <tbody id="expensesBody"></tbody>
+            <tfoot><tr class="tfoot-row"><td colspan="3" class="total" style="text-align:right"><strong>TOTAL INVERTIDO</strong></td><td class="amt total" id="totalInvertido" style="font-size:16px;color:var(--text)">S/ 4,600.80</td><td></td></tr></tfoot>
+        </table>
+        <div class="add-form">
+            <div><label>Fecha</label><input type="text" id="addFecha" placeholder="07-May"></div>
+            <div><label>Concepto</label><input type="text" id="addConcepto" placeholder="Ej: Alimento diario"></div>
+            <div><label>Detalle</label><input type="text" id="addDetalle" placeholder="Ej: Soya 1kg + Maíz 2kg"></div>
+            <div><label>Tipo</label><select id="addTipo"><option value="alimentacion">Alimentación</option><option value="medicina">Medicina</option><option value="transporte">Transporte</option><option value="otro">Otro</option></select></div>
+            <div><label>Monto S/</label><input type="number" id="addMonto" placeholder="0.00" step="0.10"></div>
+            <div><label>&nbsp;</label><button class="btn btn-green" onclick="agregarGasto()">+ Agregar</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== SIMULADOR VENTA ===== -->
+<div id="venta" class="page">
+    <div class="page-title">Simulador de Venta</div>
+    <div class="card">
+        <div class="card-title">Calcula tu Ganancia</div>
+        <div class="sim-grid">
+            <div class="sim-group"><label>Precio de Venta (S/)</label><input type="number" id="precioVenta" value="6300" oninput="calcularVenta()"></div>
+            <div class="sim-group"><label>Días Extra en Corral</label><input type="number" id="diasExtra" value="0" oninput="calcularVenta()"></div>
+            <div class="sim-group"><label>Gastos Extra (S/)</label><input type="number" id="gastosExtra" value="0" oninput="calcularVenta()"></div>
+            <div class="result-box" id="resultBox"><div class="result-label">Ganancia Neta</div><div class="result-value" id="resultGanancia">S/ 1,699.20</div><div class="result-roi" id="resultRoi">ROI: 36.9%</div></div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-title">Escenarios de Salida</div>
+        <table>
+            <tr><th>Escenario</th><th>Venta</th><th>Gasto Alim.</th><th style="text-align:right">Ganancia</th><th style="text-align:right">ROI</th></tr>
+            <tr><td class="total">Vender esta semana</td><td>S/ 6,300</td><td>~S/ 122</td><td class="amt" style="color:var(--green)">S/ 1,577</td><td class="amt" style="color:var(--green)">34%</td></tr>
+            <tr><td>Contraoferta aceptada</td><td>S/ 6,500</td><td>~S/ 122</td><td class="amt" style="color:var(--green)">S/ 1,777</td><td class="amt" style="color:var(--green)">38%</td></tr>
+            <tr><td>Venta en 2 semanas</td><td>S/ 6,300</td><td>~S/ 245</td><td class="amt" style="color:var(--amber)">S/ 1,454</td><td class="amt" style="color:var(--amber)">31%</td></tr>
+            <tr><td>Engorde 1 mes</td><td>S/ 6,500</td><td>~S/ 525</td><td class="amt" style="color:var(--red)">S/ 1,374</td><td class="amt" style="color:var(--red)">28%</td></tr>
+        </table>
+    </div>
+    <div class="card" style="text-align:center">
+        <div class="card-title">Cerrar Operación</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Cuando se concrete la venta, registra el cierre aquí:</p>
+        <button class="btn-sold" onclick="marcarVendido()">🏷️ MARCAR COMO VENDIDO</button>
+    </div>
+</div>
+
+<!-- ===== ALERTAS ===== -->
+<div id="alertas" class="page">
+    <div class="page-title">Alertas y Recomendaciones</div>
+    <div class="alert urg"><div class="alert-icon">🔴</div><div><div class="alert-tag">!! URGENCIA !!</div><strong>Contactar comprador HOY.</strong> Cada día sin vender cuesta S/ 17.50. Contraoferta: S/ 6,500. Si rechaza, cerrar en S/ 6,300 sin dudar.</div></div>
+    <div class="alert urg"><div class="alert-icon">🔴</div><div><div class="alert-tag">!! URGENCIA !!</div><strong>Pesar al animal en báscula.</strong> El peso de ~300 kg es visual (±15% error). El precio justo de venta depende del peso real verificado.</div></div>
+    <div class="alert warn"><div class="alert-icon">🟡</div><div><div class="alert-tag">!! ALERTA !!</div><strong>Confirmar precios de insumos.</strong> Soya (S/3.50), Pasta (S/2.20), Coronta (S/0.80) y Chala (S/0.40) son estimados. Verificar con proveedor local para ajustar costos reales.</div></div>
+    <div class="alert warn"><div class="alert-icon">🟡</div><div><div class="alert-tag">!! ALERTA !!</div><strong>Dieta al 66% fibra.</strong> La receta original tiene demasiado relleno. Usar Dieta Optimizada A (12 kg/día) para mejor relación energía/fibra al 42%/58%.</div></div>
+    <div class="alert info"><div class="alert-icon">🔵</div><div><div class="alert-tag">RECOMENDACIÓN</div><strong>Soya 1 kg/día NO se recorta jamás.</strong> Es el único insumo que garantiza desarrollo muscular. Sin ella, el animal solo se "infla" con fibra sin ganar carne.</div></div>
+    <div class="alert info"><div class="alert-icon">🔵</div><div><div class="alert-tag">ESTRATEGIA</div><strong>Rotación > Engorde.</strong> 3 operaciones rápidas = S/ 5,100 de ganancia vs. 1 engorde de 3 meses = S/ 430. La ganancia está en la velocidad de rotación del capital.</div></div>
+    <div class="alert ok"><div class="alert-icon">🟢</div><div><div class="alert-tag">POSITIVO</div><strong>Animal en buena condición.</strong> Dócil, sin signos de enfermedad. Condición corporal adecuada para venta inmediata.</div></div>
+    <div class="alert ok"><div class="alert-icon">🟢</div><div><div class="alert-tag">POSITIVO</div><strong>Comprador identificado.</strong> Existe demanda real a S/ 6,300. El mercado de Ica cotiza a ~S/ 15/kg vivo, muy por encima del promedio nacional.</div></div>
+</div>
+
+<!-- ===== BITÁCORA ===== -->
+<div id="bitacora" class="page">
+    <div class="page-title">Bitácora de la Operación</div>
+    <div class="card">
+        <div class="card-title">Línea de Tiempo</div>
+        <div class="timeline">
+            <div class="tl-item"><div class="tl-date">06 Mayo 2026</div><div class="tl-text">Compra del torito — <span class="tl-amt">S/ 4,500</span></div></div>
+            <div class="tl-item"><div class="tl-date">06 Mayo 2026</div><div class="tl-text">Flete de traslado al corral — <span class="tl-amt">S/ 90</span></div></div>
+            <div class="tl-item"><div class="tl-date">06 Mayo 2026 — 18:16</div><div class="tl-text">Alimentación de urgencia: Acemita 4kg + Afrecho 1kg + Polvillo 1kg — <span class="tl-amt">S/ 10.80</span></div></div>
+            <div class="tl-item"><div class="tl-date">06 Mayo 2026</div><div class="tl-text">Se identifica comprador potencial → Oferta: <span class="tl-amt">S/ 6,300</span></div></div>
+            <div class="tl-item"><div class="tl-date">06 Mayo 2026</div><div class="tl-text">Análisis financiero: Venta inmediata = opción más rentable (ROI 37%)</div></div>
+            <div class="tl-item"><div class="tl-date">06 Mayo 2026</div><div class="tl-text">Dieta Optimizada A aprobada: 12 kg/día en 2 tomas (6:00 AM + 4:00 PM)</div></div>
+        </div>
+    </div>
+</div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

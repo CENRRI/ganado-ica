@@ -3,7 +3,7 @@
 // ============================================================
 const CONFIG = {
     repo: 'CENRRI/ganado-ica',
-    path: 'dashboard/data.json',
+    path: 'data.json',
     token: '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'
 };
 
@@ -18,7 +18,11 @@ let DATA = {
         { fecha:'08-May 2026', tipo:'otro', concepto:'Agua', detalle:'Agua bebederos - Asociación', monto:7.50 },
         { fecha:'09-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'Concentrado - AGROMARCO 60kg', monto:54.00 },
         { fecha:'11-May 2026', tipo:'alimentacion', concepto:'Proyección Alimento', detalle:'Ración diaria (S/35) x 25 días', monto:875.00 },
-        { fecha:'11-May 2026', tipo:'otro', concepto:'Limpieza', detalle:'Limpieza de pozo y corral', monto:30.00 }
+        { fecha:'11-May 2026', tipo:'otro', concepto:'Limpieza', detalle:'Limpieza de pozo y corral', monto:30.00 },
+        { fecha:'15-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'24 sacos de Forraje Seco (AGROMARCO)', monto:792.00 },
+        { fecha:'15-May 2026', tipo:'alimentacion', concepto:'Soya', detalle:'2 sacos de Torta de Soya (MESAJU)', monto:192.00 },
+        { fecha:'15-May 2026', tipo:'alimentacion', concepto:'Maíz Amarillo', detalle:'2 sacos de Maíz Polvillo Nacional 50kg (N&C SAC)', monto:146.00 },
+        { fecha:'15-May 2026', tipo:'transporte', concepto:'Flete', detalle:'Traslado La Tinguiña - San Joaquin (24 conc + 2 soya + 2 maiz)', monto:164.00 }
     ],
     aportes: [
         { socio:'Socio A', monto:1500, fecha:'12-may' },
