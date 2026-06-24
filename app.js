@@ -22,7 +22,8 @@ let DATA = {
         { fecha:'15-May 2026', tipo:'alimentacion', concepto:'Concentrado', detalle:'24 sacos de Forraje Seco (AGROMARCO)', monto:792.00 },
         { fecha:'15-May 2026', tipo:'alimentacion', concepto:'Soya', detalle:'2 sacos de Torta de Soya (MESAJU)', monto:192.00 },
         { fecha:'15-May 2026', tipo:'alimentacion', concepto:'Maíz Amarillo', detalle:'2 sacos de Maíz Polvillo Nacional 50kg (N&C SAC)', monto:146.00 },
-        { fecha:'15-May 2026', tipo:'transporte', concepto:'Flete', detalle:'Traslado La Tinguiña - San Joaquin (24 conc + 2 soya + 2 maiz)', monto:164.00 }
+        { fecha:'15-May 2026', tipo:'transporte', concepto:'Flete', detalle:'Traslado La Tinguiña - San Joaquin (24 conc + 2 soya + 2 maiz)', monto:164.00 },
+        { fecha:'24-May 2026', tipo:'medicinas', concepto:'Veterinario', detalle:'Medicinas y vitaminas para los toritos', monto:120.00 }
     ],
     aportes: [
         { socio:'Socio A', monto:1500, fecha:'12-may' },
