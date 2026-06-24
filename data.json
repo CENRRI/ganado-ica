@@ -24,7 +24,12 @@
         { "fecha":"24-Jun 2026", "tipo":"transporte", "concepto":"Flete", "detalle":"Flete", "monto":30.00 },
         { "fecha":"24-Jun 2026", "tipo":"otro", "concepto":"Propina", "detalle":"Propina", "monto":5.00 },
         { "fecha":"24-May 2026", "tipo":"otro", "concepto":"Agua", "detalle":"Agua bebederos - Asociación", "monto":7.50 },
-        { "fecha":"09-Jun 2026", "tipo":"otro", "concepto":"Agua", "detalle":"Agua bebederos - Asociación", "monto":7.50 }
+        { "fecha":"09-Jun 2026", "tipo":"otro", "concepto":"Agua", "detalle":"Agua bebederos - Asociación", "monto":7.50 },
+        { "fecha":"09-May 2026", "tipo":"otro", "concepto":"Servicio", "detalle":"Servicio Carlos Vera", "monto":30.00 },
+        { "fecha":"14-May 2026", "tipo":"otro", "concepto":"Servicio", "detalle":"Servicio Carlos Vera", "monto":20.00 },
+        { "fecha":"14-May 2026", "tipo":"otro", "concepto":"Servicio", "detalle":"Servicio Carlos Vera", "monto":10.00 },
+        { "fecha":"19-May 2026", "tipo":"otro", "concepto":"Servicio", "detalle":"Servicio Carlos Vera (A cta del mes)", "monto":50.00 },
+        { "fecha":"25-May 2026", "tipo":"otro", "concepto":"Servicio", "detalle":"Servicio Carlos Vera", "monto":60.00 }
     ],
     "aportes": [
         { "socio":"Socio A", "monto":1500, "fecha":"12-may" },
